@@ -5,9 +5,9 @@ function App() {
 
   return (
     <BrowserRouter>
-    <Routes>
-      <Route element={<Home />} path="/" />
-    </Routes>
+      <Routes>
+        <Route element={<Home />} path="/" />
+      </Routes>
     </BrowserRouter>
   );
 }

@@ -27,7 +27,13 @@ export const getMe = async (
 
         res.status(200).json({
             message: "User retrieved successfully!",
-            data: user
+            data: {
+                id: user.dataValues.id,
+                name: user.dataValues.name,
+                email: user.dataValues.email,
+                phone: user.dataValues.phone,
+                role: user.dataValues.role
+            }
         });
     }
     catch (err) {
