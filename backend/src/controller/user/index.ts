@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { throwCustomError } from "../../utils/error";
-import { User } from "../../models";
+import { User, BillingDetail, PaymentMethod } from "../../models";
 import { sequelize } from "../../config/db";
 import { hashPassword } from "../../utils/bcrypt";
 
@@ -99,6 +99,128 @@ export const updateUserDetail = async (
     }
     catch (err) {
         await transaction.rollback();
+        next(err);
+    }
+}
+
+export const getAllUsers = async (
+    req: Request & { user?: { id: string } },
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return throwCustomError(401, "Unauthorized");
+        }
+
+        // Get all users except admins
+        const users = await User.findAll({
+            where: { role: "user" },
+            attributes: { exclude: ["password"] },
+            order: [["createdAt", "DESC"]]
+        });
+
+        res.status(200).json({
+            message: "Users retrieved successfully!",
+            data: users
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+}
+
+export const deleteUser = async (
+    req: Request & { user?: { id: string } },
+    res: Response,
+    next: NextFunction
+) => {
+    const transaction = await sequelize.transaction();
+    try {
+        const userId = req.user?.id;
+        const { id } = req.params;
+
+        if (!userId) {
+            return throwCustomError(401, "Unauthorized");
+        }
+
+        if (!id) {
+            return throwCustomError(400, "User ID is required!");
+        }
+
+        const user = await User.findOne({
+            where: { id },
+            transaction
+        });
+
+        if (!user) {
+            return throwCustomError(404, "User not found!");
+        }
+
+        // Prevent deleting admin users
+        if (user.dataValues.role === "admin") {
+            return throwCustomError(403, "Cannot delete admin users!");
+        }
+
+        await user.destroy({ transaction });
+        await transaction.commit();
+
+        res.status(200).json({
+            message: "User deleted successfully!"
+        });
+    }
+    catch (err) {
+        await transaction.rollback();
+        next(err);
+    }
+}
+
+export const getAllVerifiedEmployees = async (
+    req: Request & { user?: { id: string } },
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return throwCustomError(401, "Unauthorized");
+        }
+
+        // Get all verified users with their verified billing details and payment methods
+        const users = await User.findAll({
+            where: {
+                role: "user",
+                isVerify: true
+            },
+            attributes: { exclude: ["password"] },
+            include: [
+                {
+                    model: BillingDetail,
+                    as: "billingDetails",
+                    where: { isVerify: true },
+                    required: true,
+                    attributes: ["id", "address", "pin", "city", "state", "isVerify"]
+                },
+                {
+                    model: PaymentMethod,
+                    as: "paymentMethods",
+                    where: { isVerify: true },
+                    required: true,
+                    attributes: ["id", "bank_name", "account_holder_name", "account_number", "ifsc", "account_type", "isVerify"]
+                }
+            ],
+            order: [["createdAt", "DESC"]]
+        });
+
+        res.status(200).json({
+            message: "Verified employees retrieved successfully!",
+            data: users
+        });
+    }
+    catch (err) {
         next(err);
     }
 }

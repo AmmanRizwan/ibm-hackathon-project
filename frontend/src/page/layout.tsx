@@ -10,7 +10,7 @@ import PaymentMethod from "./payment_method";
 import Invoice from "./invoice";
 import Transaction from "./transaction";
 import PermissionRoute from "@/utils/PermissionRoute";
-import AdminBillingDetail from "./admin/billing_detail";
+import AdminBillingDetail from "./admin/manage_employee";
 import AdminInvoice from "./admin/invoice";
 import AdminPaymentMethod from "./admin/payment_method";
 import AdminTransaction from "./admin/transcation";
@@ -56,7 +56,7 @@ const LayoutContent = () => {
                             <Route element={<Transaction />} path="transaction" />
 
                             <Route element={<PermissionRoute />} path="admin/*">
-                                <Route element={<AdminBillingDetail />} path="bill" />
+                                <Route element={<AdminBillingDetail />} path="manage" />
                                 <Route element={<AdminInvoice />} path="invoice-check"/>
                                 <Route element={<AdminPaymentMethod />} path="payment" />
                                 <Route element={<AdminTransaction />} path="transaction" />

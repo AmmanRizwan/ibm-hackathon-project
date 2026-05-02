@@ -55,8 +55,7 @@ const NavBar = () => {
           <div className="flex-shrink-0">
             <button
               onClick={() => navigate('/')}
-              className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
-              style={{ color: '#2563eb' }}
+              className="text-2xl font-bold md:hidden transition-colors"
             >
               Emp Pay
             </button>

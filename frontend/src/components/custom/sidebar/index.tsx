@@ -94,7 +94,7 @@ const Sidebar = () => {
   const adminMenuItems: MenuItem[] = [
     {
       title: 'Manage Employees',
-      path: '/user/admin/bill',
+      path: '/user/admin/manage',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
@@ -154,7 +154,7 @@ const Sidebar = () => {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white border-r shadow-lg z-40 transition-transform duration-300 ease-in-out',
+          'fixed top-0 left-0 h-[calc(100vh)] bg-white border-r shadow-lg z-40 transition-transform duration-300 ease-in-out',
           'w-64',
           // Desktop: always visible, Mobile: slide in/out based on isOpen
           toggle ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
@@ -163,7 +163,7 @@ const Sidebar = () => {
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
           <div className="p-4 border-b flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-800">Navigation</h2>
+            <h2 className="text-lg font-semibold mb-[4px] text-gray-800">Employee Pay</h2>
             {/* Close button for sidebar */}
             <button
               onClick={() => dispatch(toggleButton(!toggle))}
