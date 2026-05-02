@@ -3,6 +3,20 @@ import { BillingDetail } from "./billing_detail";
 import { PaymentMethod } from "./payment_method";
 import { Invoice } from "./invoice";
 import { Transaction } from "./transaction";
+import { Otp } from "./otp";
+
+// User <-> Otp (One-to-Many)
+User.hasMany(Otp, {
+    foreignKey: "userId",
+    as: "otps",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+});
+
+Otp.belongsTo(User, {
+    foreignKey: "userId",
+    as: "user",
+});
 
 // User <-> BillingDetail (One-to-Many)
 User.hasMany(BillingDetail, {
@@ -82,6 +96,6 @@ Transaction.belongsTo(PaymentMethod, {
     as: "payeeBankAccount",
 });
 
-export { User, BillingDetail, PaymentMethod, Invoice, Transaction };
+export { User, BillingDetail, PaymentMethod, Invoice, Transaction, Otp };
 
 // Made with Bob

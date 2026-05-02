@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from "cors";
 import env from './config/env';
 
+import Router from "./routes";
 import { sequelize } from './config/db';
 import { logger } from './utils/logger';
 import { pinoHttp } from 'pino-http';
@@ -26,6 +27,8 @@ app.use(express.urlencoded({ extended: false }));
 app.get("/health", (req: Request, res: Response) => {
   res.status(200).json({ health: "OK" });
 })
+
+app.use("/v1/api", Router);
 
 sequelize.sync({ alter: env.ENV === "development"})
 .then(() => {
