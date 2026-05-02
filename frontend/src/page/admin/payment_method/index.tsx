@@ -292,8 +292,9 @@ const AdminPaymentMethod = () => {
                             onClick={openPaymentDialog}
                             disabled={loading || employees.length === 0}
                             size="lg"
+                            className='bg-green-300 hover:bg-green-400'
                         >
-                            <DollarSign className="h-5 w-5 mr-2" />
+                            <DollarSign className="h-5 w-5 mr-1" />
                             Pay All Employees
                         </Button>
                     </div>
@@ -432,7 +433,7 @@ const AdminPaymentMethod = () => {
                         >
                             Cancel
                         </Button>
-                        <Button onClick={handlePayAll} disabled={processing}>
+                        <Button className='w-full border border-1 mb-2 hover:shadow hover:cursor-pointer' onClick={handlePayAll} disabled={processing}>
                             {processing ? (
                                 <>
                                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />

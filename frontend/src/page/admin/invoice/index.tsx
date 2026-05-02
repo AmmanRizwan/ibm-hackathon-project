@@ -33,8 +33,6 @@ import {
     Edit,
     Trash2,
     Loader2,
-    Calendar,
-    DollarSign,
     User,
     Mail,
     Phone,

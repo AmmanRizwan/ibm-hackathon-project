@@ -454,7 +454,7 @@ const Profile = () => {
                                     <div className="pt-4">
                                         <Button
                                             type="submit"
-                                            className="w-full"
+                                            className="w-full border border-1 hover:shadow hover:cursor-pointer"
                                             disabled={isLoading}
                                         >
                                             <Lock className="h-4 w-4 mr-2" />
