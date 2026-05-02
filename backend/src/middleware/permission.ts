@@ -17,7 +17,7 @@ const permission = async (req: Request & { user?: { id: string }}, res: Response
             return throwCustomError(404, "Cannot find the user!");
         }
 
-        if (user.dataValues.role !== "ADMIN") {
+        if (user.dataValues.role !== "admin") {
             return throwCustomError(403, "User is not administrator");
         }
 
