@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
-import { getAllTransactions } from '@/service/transaction';
-import type { ITransaction } from '@/service/transaction/interface';
+import { getAllTransactions, createTransaction } from '@/service/transaction';
+import type { ITransaction, ICreateTransaction } from '@/service/transaction/interface';
+import { getAllInvoices } from '@/service/invoice';
+import { getAllPaymentMethods } from '@/service/payment_methods';
+import { getAllUsers } from '@/service/user';
 import {
     Accordion,
     AccordionContent,
@@ -16,7 +19,25 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, ArrowRight, DollarSign, RefreshCw } from 'lucide-react';
+import { Calendar, ArrowRight, DollarSign, RefreshCw, Plus } from 'lucide-react';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 interface GroupedTransactions {
     [key: string]: ITransaction[];
@@ -26,9 +47,28 @@ const AdminTransaction = () => {
     const [transactions, setTransactions] = useState<ITransaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    // Form data
+    const [invoices, setInvoices] = useState<any[]>([]);
+    const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
+    const [users, setUsers] = useState<any[]>([]);
+    const [formData, setFormData] = useState<ICreateTransaction>({
+        payer_bank_account_id: '',
+        payee_bank_account_id: '',
+        payer_name: '',
+        payer_email: '',
+        payee_name: '',
+        payee_email: '',
+        invoiceId: '',
+        amount: 0,
+        status: 'pending',
+    });
 
     useEffect(() => {
         fetchTransactions();
+        fetchFormData();
     }, []);
 
     const fetchTransactions = async () => {
@@ -41,6 +81,74 @@ const AdminTransaction = () => {
             setError(err.response?.data?.message || 'Failed to fetch transactions');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchFormData = async () => {
+        try {
+            const [invoicesRes, paymentMethodsRes, usersRes] = await Promise.all([
+                getAllInvoices({ limit: 1000 }),
+                getAllPaymentMethods({ limit: 1000 }),
+                getAllUsers(),
+            ]);
+            setInvoices(invoicesRes.data.invoices || []);
+            setPaymentMethods(paymentMethodsRes.data.paymentMethods || []);
+            setUsers(usersRes.data || []);
+        } catch (err: any) {
+            console.error('Failed to fetch form data:', err);
+        }
+    };
+
+    const handleInputChange = (field: keyof ICreateTransaction, value: any) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleUserSelect = (userId: string, type: 'payer' | 'payee') => {
+        const user = users.find(u => u.id === userId);
+        if (user) {
+            if (type === 'payer') {
+                setFormData(prev => ({
+                    ...prev,
+                    payer_name: user.name,
+                    payer_email: user.email,
+                }));
+            } else {
+                setFormData(prev => ({
+                    ...prev,
+                    payee_name: user.name,
+                    payee_email: user.email,
+                }));
+            }
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        try {
+            // Prepare data, converting empty strings to undefined for optional fields
+            const submitData = {
+                ...formData,
+                payer_bank_account_id: formData.payer_bank_account_id || undefined,
+            };
+            await createTransaction(submitData);
+            setIsDialogOpen(false);
+            setFormData({
+                payer_bank_account_id: '',
+                payee_bank_account_id: '',
+                payer_name: '',
+                payer_email: '',
+                payee_name: '',
+                payee_email: '',
+                invoiceId: '',
+                amount: 0,
+                status: 'pending',
+            });
+            fetchTransactions();
+        } catch (err: any) {
+            alert(err.response?.data?.message || 'Failed to create transaction');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -154,15 +262,232 @@ const AdminTransaction = () => {
                             View and manage all transactions grouped by month
                         </p>
                     </div>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={fetchTransactions}
-                        className="gap-2"
-                    >
-                        <RefreshCw className="h-4 w-4" />
-                        Refresh
-                    </Button>
+                    <div className="flex gap-2">
+                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button size="sm" className="gap-2">
+                                    <Plus className="h-4 w-4" />
+                                    Create Transaction
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                                <DialogHeader>
+                                    <DialogTitle>Create New Transaction</DialogTitle>
+                                    <DialogDescription>
+                                        Fill in the details to create a new transaction
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* Invoice Selection */}
+                                        <div className="space-y-2">
+                                            <Label htmlFor="invoiceId">Invoice *</Label>
+                                            <Select
+                                                value={formData.invoiceId}
+                                                onValueChange={(value) => handleInputChange('invoiceId', value)}
+                                                required
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select invoice" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {invoices.map((invoice) => (
+                                                        <SelectItem key={invoice.id} value={invoice.id}>
+                                                            {invoice.invoice_number} - ${invoice.total_amount}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+
+                                        {/* Amount */}
+                                        <div className="space-y-2">
+                                            <Label htmlFor="amount">Amount *</Label>
+                                            <Input
+                                                id="amount"
+                                                type="number"
+                                                step="0.01"
+                                                min="0.01"
+                                                value={formData.amount}
+                                                onChange={(e) => handleInputChange('amount', parseFloat(e.target.value))}
+                                                required
+                                            />
+                                        </div>
+
+                                        {/* Status */}
+                                        <div className="space-y-2">
+                                            <Label htmlFor="status">Status</Label>
+                                            <Select
+                                                value={formData.status}
+                                                onValueChange={(value) => handleInputChange('status', value)}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select status" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="pending">Pending</SelectItem>
+                                                    <SelectItem value="completed">Completed</SelectItem>
+                                                    <SelectItem value="failed">Failed</SelectItem>
+                                                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+
+                                        {/* Payee Bank Account */}
+                                        <div className="space-y-2">
+                                            <Label htmlFor="payee_bank_account_id">Payee Bank Account *</Label>
+                                            <Select
+                                                value={formData.payee_bank_account_id}
+                                                onValueChange={(value) => handleInputChange('payee_bank_account_id', value)}
+                                                required
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select payee account" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {paymentMethods.map((pm) => (
+                                                        <SelectItem key={pm.id} value={pm.id}>
+                                                            {pm.account_holder_name} - {pm.account_number}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+
+                                        {/* Payer Bank Account (Optional) */}
+                                        <div className="space-y-2 md:col-span-2">
+                                            <Label htmlFor="payer_bank_account_id">Payer Bank Account (Optional)</Label>
+                                            <Select
+                                                value={formData.payer_bank_account_id}
+                                                onValueChange={(value) => handleInputChange('payer_bank_account_id', value)}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select payer account" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="">None</SelectItem>
+                                                    {paymentMethods.map((pm) => (
+                                                        <SelectItem key={pm.id} value={pm.id}>
+                                                            {pm.account_holder_name} - {pm.account_number}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+
+                                    {/* Payer Information */}
+                                    <div className="space-y-2">
+                                        <Label>Payer Information</Label>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2 md:col-span-2">
+                                                <Label htmlFor="payer_user">Select User (Optional)</Label>
+                                                <Select
+                                                    onValueChange={(value) => handleUserSelect(value, 'payer')}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select user to autofill" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {users.map((user) => (
+                                                            <SelectItem key={user.id} value={user.id}>
+                                                                {user.name} ({user.email})
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="payer_name">Payer Name *</Label>
+                                                <Input
+                                                    id="payer_name"
+                                                    value={formData.payer_name}
+                                                    onChange={(e) => handleInputChange('payer_name', e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="payer_email">Payer Email *</Label>
+                                                <Input
+                                                    id="payer_email"
+                                                    type="email"
+                                                    value={formData.payer_email}
+                                                    onChange={(e) => handleInputChange('payer_email', e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Payee Information */}
+                                    <div className="space-y-2">
+                                        <Label>Payee Information</Label>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2 md:col-span-2">
+                                                <Label htmlFor="payee_user">Select User (Optional)</Label>
+                                                <Select
+                                                    onValueChange={(value) => handleUserSelect(value, 'payee')}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select user to autofill" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {users.map((user) => (
+                                                            <SelectItem key={user.id} value={user.id}>
+                                                                {user.name} ({user.email})
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="payee_name">Payee Name *</Label>
+                                                <Input
+                                                    id="payee_name"
+                                                    value={formData.payee_name}
+                                                    onChange={(e) => handleInputChange('payee_name', e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="payee_email">Payee Email *</Label>
+                                                <Input
+                                                    id="payee_email"
+                                                    type="email"
+                                                    value={formData.payee_email}
+                                                    onChange={(e) => handleInputChange('payee_email', e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <DialogFooter>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => setIsDialogOpen(false)}
+                                            disabled={isSubmitting}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button type="submit" disabled={isSubmitting}>
+                                            {isSubmitting ? 'Creating...' : 'Create Transaction'}
+                                        </Button>
+                                    </DialogFooter>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={fetchTransactions}
+                            className="gap-2"
+                        >
+                            <RefreshCw className="h-4 w-4" />
+                            Refresh
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Summary Cards */}

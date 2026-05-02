@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { throwCustomError } from "../../utils/error";
-import { Transaction, User } from "../../models";
+import { Transaction, User, Invoice, PaymentMethod } from "../../models";
 import { sequelize } from "../../config/db";
 import { Op } from "sequelize";
 
@@ -87,14 +87,20 @@ export const getTransactionById = async (
 
 // Admin: Create transaction
 export const createTransaction = async (
-    req: Request,
+    req: Request & { user?: { id: string }},
     res: Response,
     next: NextFunction
 ) => {
     const transaction = await sequelize.transaction();
     try {
+        const userId = req.user?.id;
+
+        if (!userId) {
+            await transaction.rollback();
+            return throwCustomError(401, "Unauthorized");
+        }
+
         const {
-            payer_bank_account_id,
             payee_bank_account_id,
             payer_name,
             payer_email,
@@ -109,13 +115,42 @@ export const createTransaction = async (
         // Validate required fields
         if (!payee_bank_account_id || !payer_name ||
             !payer_email || !payee_name || !payee_email || !invoiceId || !amount) {
+            await transaction.rollback();
             return throwCustomError(400, "All required fields must be provided!");
         }
 
         // Validate amount
         if (amount <= 0) {
+            await transaction.rollback();
             return throwCustomError(400, "Amount must be greater than zero!");
         }
+
+        // Validate invoice exists
+        const invoice = await Invoice.findByPk(invoiceId, { transaction });
+        if (!invoice) {
+            await transaction.rollback();
+            return throwCustomError(404, "Invoice not found!");
+        }
+
+        // Validate payee bank account exists
+        const payeeBankAccount = await PaymentMethod.findByPk(payee_bank_account_id, { transaction });
+        if (!payeeBankAccount) {
+            await transaction.rollback();
+            return throwCustomError(404, "Payee bank account not found!");
+        }
+
+        // Get admin user's bank account (payer bank account)
+        const adminBankAccount = await PaymentMethod.findOne({
+            where: { userId },
+            transaction
+        });
+
+        if (!adminBankAccount) {
+            await transaction.rollback();
+            return throwCustomError(404, "Admin bank account not found! Please add a payment method first.");
+        }
+
+        const payer_bank_account_id = adminBankAccount.get("id") as string;
 
         // Create transaction
         const newTransaction = await Transaction.create(
