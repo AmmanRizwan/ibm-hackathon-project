@@ -9,7 +9,7 @@ const getMe = async () => {
 
 // Update user details
 const updateUserDetail = async (payload: IUpdateUserDetail) => {
-    const response = await api.put(`/user/me`, payload);
+    const response = await api.put(`/user/update`, payload);
     return response.data;
 }
 

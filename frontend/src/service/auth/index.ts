@@ -16,7 +16,7 @@ const login = async (payload: ILogin) => {
 }
 
 const loginVerify = async (payload: ILoginVerify) => {
-    const response = await api.post(`/auth/login-verify`, payload);
+    const response = await api.post(`/auth/login/verify`, payload);
     return response.data;
 }
 
@@ -26,27 +26,27 @@ const signUp = async (payload: ISignUp) => {
 }
 
 const signUpVerify = async (payload: ISignUpVerify) => {
-    const response = await api.post(`/auth/signup-verify`, payload);
+    const response = await api.post(`/auth/signup/verify`, payload);
     return response.data;
 }
 
 const signUpResendOtp = async (payload: ISignUpResendOtp) => {
-    const response = await api.post(`/auth/signup-resend-otp`, payload);
+    const response = await api.post(`/auth/signup/resend`, payload);
     return response.data;
 }
 
 const forgetEmail = async (payload: IForgetEmail) => {
-    const response = await api.post(`/auth/forget-email`, payload);
+    const response = await api.post(`/auth/forgot-password`, payload);
     return response.data;
 }
 
 const forgetVerifyOtp = async (payload: IForgetVerifyOtp) => {
-    const response = await api.post(`/auth/forget-verify-otp`, payload);
+    const response = await api.post(`/auth/forgot-password/resend`, payload);
     return response.data;
 }
 
 const forgetVerify = async (payload: IForgetVerify) => {
-    const response = await api.post(`/auth/forget-verify`, payload);
+    const response = await api.post(`/auth/forgot-password/verify`, payload);
     return response.data;
 }
 

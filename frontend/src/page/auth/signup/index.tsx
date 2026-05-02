@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
 import {
   Eye,
   EyeOff,
@@ -32,6 +33,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import PageLoader from "@/components/custom/page-loader";
+import { signUp, signUpVerify, signUpResendOtp } from "@/service/auth";
+import type { ISignUp, ISignUpVerify, ISignUpResendOtp } from "@/service/auth/interface";
 
 interface SignUpFormValues {
     name: string;
@@ -51,8 +54,8 @@ const defaultValues: Partial<SignUpFormValues> = {
 
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const navigate = useNavigate();
 
   const form = useForm<SignUpFormValues>({
     defaultValues,
@@ -60,24 +63,72 @@ export default function SignUpPage() {
 
   const steps = ["Basic Information", "Verify OTP"];
 
+  // Signup mutation
+  const signUpMutation = useMutation({
+    mutationFn: (payload: ISignUp) => signUp(payload),
+    onSuccess: () => {
+      setCurrentStep(1);
+    },
+    onError: (error: any) => {
+      console.error("Signup error:", error);
+      // You can add toast notification here
+    },
+  });
+
+  // Verify OTP mutation
+  const verifyOtpMutation = useMutation({
+    mutationFn: (payload: ISignUpVerify) => signUpVerify(payload),
+    onSuccess: () => {
+      navigate("/user/profile");
+    },
+    onError: (error: any) => {
+      console.error("OTP verification error:", error);
+      // You can add toast notification here
+    },
+  });
+
+  // Resend OTP mutation
+  const resendOtpMutation = useMutation({
+    mutationFn: (payload: ISignUpResendOtp) => signUpResendOtp(payload),
+    onSuccess: () => {
+      console.log("OTP resent successfully");
+      // You can add toast notification here
+    },
+    onError: (error: any) => {
+      console.error("Resend OTP error:", error);
+      // You can add toast notification here
+    },
+  });
+
   const onBasicInformationSubmit = async (data: SignUpFormValues) => {
-    setIsLoading(true);
+    const payload: ISignUp = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      phone: data.phone,
+    };
     
-    // Log the form data
-    console.log(data);
-    
-    // Move to the OTP verification step
-    setCurrentStep(1);
-    setIsLoading(false);
+    await signUpMutation.mutateAsync(payload);
   };
 
-  const onOtpVerification = async () => {
+  const onOtpVerification = async (data: SignUpFormValues) => {
+    const payload: ISignUpVerify = {
+      email: data.email,
+      otp: data.otp,
+    };
     
+    await verifyOtpMutation.mutateAsync(payload);
   };
 
   const onRequestSignUpOtp = async () => {
+    const payload: ISignUpResendOtp = {
+      email: form.getValues("email"),
+    };
     
+    await resendOtpMutation.mutateAsync(payload);
   };
+
+  const isLoading = signUpMutation.isPending || verifyOtpMutation.isPending || resendOtpMutation.isPending;
 
   const renderStepContent = () => {
     switch (currentStep) {

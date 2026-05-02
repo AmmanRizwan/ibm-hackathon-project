@@ -12,7 +12,7 @@ const getAllInvoices = async (query?: IGetAllInvoicesQuery) => {
     if (query?.page) params.append('page', query.page.toString());
     if (query?.limit) params.append('limit', query.limit.toString());
     
-    const response = await api.get(`/invoice?${params.toString()}`);
+    const response = await api.get(`/invoice/admin?${params.toString()}`);
     return response.data;
 }
 
@@ -22,7 +22,7 @@ const getUserInvoices = async (query?: IGetUserInvoicesQuery) => {
     if (query?.page) params.append('page', query.page.toString());
     if (query?.limit) params.append('limit', query.limit.toString());
     
-    const response = await api.get(`/invoice/user?${params.toString()}`);
+    const response = await api.get(`/invoice?${params.toString()}`);
     return response.data;
 }
 
