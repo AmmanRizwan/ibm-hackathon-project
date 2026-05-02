@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - Employee Pay</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: black;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        .company-info h1 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            color: #333;
+        }
+        .company-info p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .invoice-title {
+            text-align: right;
+        }
+        .invoice-title h2 {
+            margin: 0;
+            font-size: 36px;
+            color: #333;
+        }
+        .invoice-title p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .billing-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+        .billing-info {
+            width: 48%;
+        }
+        .billing-info h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: #333;
+            text-transform: uppercase;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+        .billing-info p {
+            margin: 5px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .invoice-table thead {
+            background-color: #333;
+            color: white;
+        }
+        .invoice-table th {
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .invoice-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        .invoice-table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 40px;
+        }
+        .totals {
+            width: 300px;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        .total-row.subtotal {
+            border-top: 1px solid #ddd;
+        }
+        .total-row.grand-total {
+            border-top: 2px solid #333;
+            font-weight: bold;
+            font-size: 18px;
+            padding-top: 12px;
+            margin-top: 8px;
+        }
+        .notes-section {
+            margin-bottom: 40px;
+        }
+        .notes-section h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .notes-section p {
+            margin: 5px 0;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #666;
+        }
+        .footer {
+            margin-top: 60px;
+            background-color: #e4e4e4;
+            padding: 30px;
+            text-align: center;
+        }
+        .footer p {
+            color: rgb(99, 97, 97);
+            font-size: 11px;
+            line-height: 20px;
+            margin: 5px 0;
+        }
+        .footer a {
+            font-weight: bold;
+            text-decoration: none;
+            color: rgb(5, 20, 153);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-paid {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .status-pending {
+            background-color: #FF9800;
+            color: white;
+        }
+        .status-overdue {
+            background-color: #F44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="company-info">
+                <h1>Employee Pay</h1>
+                <p>123 Business Street</p>
+                <p>City, State 12345</p>
+                <p>Phone: (123) 456-7890</p>
+                <p>Email: info@employeepay.com</p>
+            </div>
+            <div class="invoice-title">
+                <h2>INVOICE</h2>
+                <p><strong>Invoice #:</strong> <%= invoiceNumber || 'INV-001' %></p>
+                <p><strong>Date:</strong> <%= invoiceDate || new Date().toLocaleDateString('en-US') %></p>
+                <p><strong>Due Date:</strong> <%= dueDate || new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('en-US') %></p>
+                <% if (status) { %>
+                    <p><span class="status-badge status-<%= status.toLowerCase() %>"><%= status %></span></p>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Billing Section -->
+        <div class="billing-section">
+            <div class="billing-info">
+                <h3>Bill To:</h3>
+                <p><strong><%= billTo?.name || 'Client Name' %></strong></p>
+                <p><%= billTo?.address || 'Client Address' %></p>
+                <p><%= billTo?.city || 'City' %>, <%= billTo?.state || 'State' %> <%= billTo?.zip || 'ZIP' %></p>
+                <p>Email: <%= billTo?.email || 'client@example.com' %></p>
+                <% if (billTo?.phone) { %>
+                    <p>Phone: <%= billTo.phone %></p>
+                <% } %>
+            </div>
+            <div class="billing-info">
+                <h3>Bill From:</h3>
+                <p><strong>Employee Pay</strong></p>
+                <p>123 Business Street</p>
+                <p>City, State 12345</p>
+                <p>Email: billing@employeepay.com</p>
+                <p>Phone: (123) 456-7890</p>
+            </div>
+        </div>
+
+        <!-- Invoice Items Table -->
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th class="text-right">Quantity</th>
+                    <th class="text-right">Rate</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (items && items.length > 0) { %>
+                    <% items.forEach(function(item) { %>
+                        <tr>
+                            <td>
+                                <strong><%= item.description %></strong>
+                                <% if (item.details) { %>
+                                    <br><small style="color: #666;"><%= item.details %></small>
+                                <% } %>
+                            </td>
+                            <td class="text-right"><%= item.quantity %></td>
+                            <td class="text-right">$<%= item.rate.toFixed(2) %></td>
+                            <td class="text-right">$<%= (item.quantity * item.rate).toFixed(2) %></td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td>Payroll Services - Monthly</td>
+                        <td class="text-right">1</td>
+                        <td class="text-right">$500.00</td>
+                        <td class="text-right">$500.00</td>
+                    </tr>
+                    <tr>
+                        <td>Employee Benefits Management</td>
+                        <td class="text-right">1</td>
+                        <td class="text-right">$200.00</td>
+                        <td class="text-right">$200.00</td>
+                    </tr>
+                    <tr>
+                        <td>Tax Filing Services</td>
+                        <td class="text-right">1</td>
+                        <td class="text-right">$150.00</td>
+                        <td class="text-right">$150.00</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+
+        <!-- Totals Section -->
+        <div class="totals-section">
+            <div class="totals">
+                <div class="total-row subtotal">
+                    <span>Subtotal:</span>
+                    <span>$<%= subtotal || '850.00' %></span>
+                </div>
+                <% if (tax) { %>
+                    <div class="total-row">
+                        <span>Tax (<%= taxRate || '10' %>%):</span>
+                        <span>$<%= tax %></span>
+                    </div>
+                <% } %>
+                <% if (discount) { %>
+                    <div class="total-row">
+                        <span>Discount:</span>
+                        <span>-$<%= discount %></span>
+                    </div>
+                <% } %>
+                <div class="total-row grand-total">
+                    <span>Total:</span>
+                    <span>$<%= total || '850.00' %></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="notes-section">
+            <h3>Payment Information:</h3>
+            <p><strong>Payment Method:</strong> <%= paymentMethod || 'Bank Transfer / Credit Card' %></p>
+            <% if (bankDetails) { %>
+                <p><strong>Bank Name:</strong> <%= bankDetails.name %></p>
+                <p><strong>Account Number:</strong> <%= bankDetails.account %></p>
+                <p><strong>Routing Number:</strong> <%= bankDetails.routing %></p>
+            <% } %>
+        </div>
+
+        <% if (notes) { %>
+            <div class="notes-section">
+                <h3>Notes:</h3>
+                <p><%= notes %></p>
+            </div>
+        <% } %>
+
+        <div class="notes-section">
+            <h3>Terms & Conditions:</h3>
+            <p>Payment is due within 30 days of invoice date. Late payments may incur additional fees. Please include invoice number with payment.</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Thank you for your business!</strong></p>
+            <p>This is a computer-generated invoice. For questions or concerns, please contact us at billing@employeepay.com</p>
+            <p>Employee Pay © <%= new Date().getFullYear() %> | All Rights Reserved</p>
+        </div>
+    </div>
+</body>
+</html>

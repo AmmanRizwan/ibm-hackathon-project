@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: black;
+        }
+        .container {
+            max-width: 450px;
+            margin: 40px auto;
+        }
+        p {
+            font-size:19px;
+        }
+        .logo {
+            width: 120px;
+            margin-bottom: 40px;
+        }
+        .logo-1 {
+            width: 110px;
+            margin-bottom: 60px;
+        }
+        .footer {
+            margin-top: 60px;
+            background-color: #e4e4e4;
+            padding: 40px 30px;
+        }
+
+        .footer a {
+            font-weight: bold;
+            list-style: none;
+            text-decoration: none;
+        }
+
+        .footer p {
+            color: rgb(99, 97, 97);
+            font-size: 11px;
+            line-height: 20px;
+        }
+        .author-mail {
+            color: rgb(5, 20, 153);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .author {
+            margin: 30px 0;
+        }
+        .success-icon {
+            font-size: 50px;
+            margin: 20px 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Employee Pay</h1>
+        <p class="author">Hi, <%= name %></p>
+        <div class="success-icon">✅</div>
+        <div>
+            <p>You have successfully logged in to your account.</p>
+        </div>
+        <div>
+            <p>
+                Login Time: <%= new Date().toLocaleString('en-US', { timeZone: 'Asia/Calcutta' }) %>
+            </p>
+        </div>
+        <div>
+            <p>
+                If you didn't attempt to login, please secure your account immediately by changing your password.
+            </p>
+        </div>
+
+        <div>
+            <p>
+                Best regards,<br>Employee Pay
+            </p>
+        </div>
+
+        <div class="footer">
+            <div>
+                <p>This message was sent to <span class="author-mail"><%= email %></span>. If you have questions or complaints, please <a href="">contact us.</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

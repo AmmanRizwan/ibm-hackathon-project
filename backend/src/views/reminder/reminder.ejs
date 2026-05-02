@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Reminder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: black;
+        }
+        .container {
+            max-width: 450px;
+            margin: 40px auto;
+        }
+        p {
+            font-size:19px;
+        }
+        .logo {
+            width: 120px;
+            margin-bottom: 40px;
+        }
+        .logo-1 {
+            width: 110px;
+            margin-bottom: 60px;
+        }
+        .footer {
+            margin-top: 60px;
+            background-color: #e4e4e4;
+            padding: 40px 30px;
+        }
+
+        .footer a {
+            font-weight: bold;
+            list-style: none;
+            text-decoration: none;
+        }
+
+        .footer p {
+            color: rgb(99, 97, 97);
+            font-size: 11px;
+            line-height: 20px;
+        }
+        .author-mail {
+            color: rgb(5, 20, 153);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .author {
+            margin: 30px 0;
+        }
+        .reminder-icon {
+            font-size: 50px;
+            margin: 20px 0;
+        }
+        .payment-details {
+            background-color: #fff;
+            border: 2px solid #ff9800;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .payment-details h3 {
+            margin-top: 0;
+            color: #ff9800;
+            font-size: 20px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #333;
+        }
+        .detail-value {
+            color: #666;
+        }
+        .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d32f2f;
+        }
+        .due-date {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        .action-button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .action-button:hover {
+            background-color: #45a049;
+        }
+        .urgent-notice {
+            background-color: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .urgent-notice p {
+            margin: 0;
+            font-size: 16px;
+            color: #856404;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Employee Pay</h1>
+        <p class="author">Hi Admin,</p>
+        <div class="reminder-icon">⏰</div>
+        <div>
+            <p>This is a friendly reminder about an upcoming payment that requires your attention.</p>
+        </div>
+
+        <div class="payment-details">
+            <h3>Payment Details</h3>
+            <div class="detail-row">
+                <span class="detail-label">Invoice Number:</span>
+                <span class="detail-value"><%= invoiceNumber || 'INV-2026-001' %></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Employee Name:</span>
+                <span class="detail-value"><%= employeeName || 'N/A' %></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Payment Period:</span>
+                <span class="detail-value"><%= paymentPeriod || 'N/A' %></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Due Date:</span>
+                <span class="detail-value due-date"><%= dueDate || 'N/A' %></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Amount Due:</span>
+                <span class="detail-value amount">₹<%= amount || '0.00' %></span>
+            </div>
+        </div>
+
+        <% if (isUrgent) { %>
+        <div class="urgent-notice">
+            <p>⚠️ <strong>Urgent:</strong> This payment is overdue or due within 24 hours. Please process it immediately to avoid any delays.</p>
+        </div>
+        <% } %>
+
+        <div>
+            <p>
+                Please review and process this payment at your earliest convenience. Click the button below to view the full invoice details.
+            </p>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="<%= invoiceLink || '#' %>" class="action-button">View Invoice</a>
+        </div>
+
+        <div>
+            <p>
+                Reminder sent on: <%= new Date().toLocaleString('en-US', { timeZone: 'Asia/Calcutta' }) %>
+            </p>
+        </div>
+
+        <div>
+            <p>
+                If you have already processed this payment, please disregard this reminder. For any questions or concerns, please contact the finance department.
+            </p>
+        </div>
+
+        <div>
+            <p>
+                Best regards,<br>Employee Pay System
+            </p>
+        </div>
+
+        <div class="footer">
+            <div>
+                <p>This is an automated reminder sent to the admin. If you have questions or need assistance, please <a href="">contact support.</a></p>
+                <p style="margin-top: 15px;">© <%= new Date().getFullYear() %> Employee Pay. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
