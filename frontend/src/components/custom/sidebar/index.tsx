@@ -20,13 +20,13 @@ const Sidebar = () => {
   const { toggle } = useSelector((state: RootState) => state.navToggle);
   const { user, token } = useSelector((state: RootState) => state.auth);
 
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = true;
   
   // Routes where sidebar should not be displayed
   const excludedRoutes = ['/auth/login', '/auth/signup', '/auth/forgot-password'];
   
   // Check if current route is in excluded routes
-  const shouldHideSidebar = excludedRoutes.includes(location.pathname);
+  const shouldHideSidebar = token && excludedRoutes.includes(location.pathname);
   
   // Debug logging
   console.log('Sidebar rendering:', {

@@ -18,6 +18,8 @@ import NavBar from "@/components/custom/navbar";
 import Sidebar from "@/components/custom/sidebar";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
+import CreateBillingDetail from "./billing_detail/new";
+import CreatePaymentMethod from "./payment_method/new";
 
 const LayoutContent = () => {
     const location = useLocation();
@@ -47,7 +49,9 @@ const LayoutContent = () => {
                         
                             <Route element={<Profile />} path="profile"/>
                             <Route element={<BillingDetail />} path="billing_detail"/>
+                            <Route element={<CreateBillingDetail />} path="billing_detail/new" />
                             <Route element={<PaymentMethod />} path="payment-method"/>
+                            <Route element={<CreatePaymentMethod />} path="payment-method/new"/>
                             <Route element={<Invoice />} path="invoice" />
                             <Route element={<Transaction />} path="transaction" />
 

@@ -11,7 +11,7 @@ const NavBar = () => {
   
   // Get auth state from Redux store
   const { toggle } = useSelector((state: RootState) => state.navToggle);
-  const { token, user } = useSelector((state: RootState) => state.auth);
+  const { token } = useSelector((state: RootState) => state.auth);
   
   // Check if user is logged in
   const isLoggedIn = !!token;
@@ -36,21 +36,13 @@ const NavBar = () => {
     return null;
   }
   
-  const handleLoginClick = () => {
-    navigate('/auth/login');
-  };
-  
-  const handleProfileClick = () => {
-    navigate('/user/profile');
-  };
-  
   const handleSlideBar = () => {
     dispatch(toggleButton(!toggle));
   }
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 w-full bg-white shadow-md border-b border-gray-200 z-50"
+      className="w-full bg-white shadow-md border-b border-gray-200 z-50"
       style={{
         backgroundColor: '#ffffff',
         borderBottom: '2px solid #e5e7eb',
@@ -78,39 +70,13 @@ const NavBar = () => {
                   null
                 ) : 
                 (
-                  <Button className='sm:hidden block' onClick={handleSlideBar}>
+                  <Button className='lg:hidden block' onClick={handleSlideBar}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                   </Button>
                 )
               }
-            
-            {isLoggedIn ? (
-              <Button
-                variant="outline"
-                onClick={handleProfileClick}
-                className="flex items-center gap-2"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span>{user?.name || 'Profile'}</span>
-              </Button>
-            ) : (
-              <Button onClick={handleLoginClick}>
-                Login
-              </Button>
-            )}
           </div>
         </div>
       </div>

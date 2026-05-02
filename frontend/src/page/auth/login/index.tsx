@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, ShieldCheck, Menu, X } from "lucide-react";
+import { Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import PageLoader from "@/components/custom/page-loader";
-import { cn } from "@/lib/utils";
 
 interface LoginFormValues {
   email: string;
@@ -30,7 +29,6 @@ interface LoginFormValues {
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const form = useForm<LoginFormValues>({
         defaultValues: {
@@ -53,79 +51,6 @@ const Login = () => {
     };
 
     return (
-        <>
-        {/* Toggle Button - Hidden when sidebar is open */}
-        {!isSidebarOpen && (
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="fixed top-20 left-4 z-50 p-2 bg-white transition-colors"
-            aria-label="Toggle sidebar"
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-        )}
-
-        {/* Overlay for mobile */}
-        {isSidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-
-        {/* Sidebar */}
-        <aside
-          className={cn(
-            'fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white border-r shadow-lg z-40 transition-transform duration-300 ease-in-out w-64',
-            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          )}
-        >
-          <div className="flex flex-col h-full">
-            {/* Sidebar Header */}
-            <div className="p-4 border-b flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-800">Menu</h2>
-              {/* Close button for sidebar */}
-              <button
-                onClick={() => setIsSidebarOpen(false)}
-                className="p-1 rounded-md hover:bg-gray-100 transition-colors"
-                aria-label="Close sidebar"
-              >
-                <X className="h-5 w-5 text-gray-600" />
-              </button>
-            </div>
-
-            {/* Menu Items */}
-            <nav className="flex-1 overflow-y-auto p-4">
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="/auth/signup"
-                    className="flex items-center gap-3 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                  >
-                    <span>Sign Up</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/auth/forgot-password"
-                    className="flex items-center gap-3 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                  >
-                    <span>Forgot Password</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/"
-                    className="flex items-center gap-3 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                  >
-                    <span>Home</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </aside>
-
         <div className="flex sm:min-h-screen sm:items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
         <PageLoader isLoading={isLoading} />
         <div className="w-full max-w-md space-y-8">
@@ -254,7 +179,6 @@ const Login = () => {
             </Card>
         </div>
         </div>
-        </>
     )
 }
 
