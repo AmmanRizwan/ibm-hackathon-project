@@ -5,7 +5,7 @@ import { Navigate, Outlet } from "react-router-dom"
 const AutoRedirect = () => {
     const { token } = useSelector((state: RootState) => state.auth);
 
-    if (!token) {
+    if (token) {
         return <Navigate to={"/auth/login"} replace />
     }
 

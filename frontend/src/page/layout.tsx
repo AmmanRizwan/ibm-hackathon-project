@@ -30,10 +30,10 @@ const Layout = () => {
                     <Route element={<Profile />} path="profile"/>
                     <Route element={<BillingDetail />} path="billing_detail"/>
                     <Route element={<PaymentMethod />} path="payment-method"/>
-                    <Route element={<Invoice />} path="/invoice" />
-                    <Route element={<Transaction />} path="/transaction" />
+                    <Route element={<Invoice />} path="invoice" />
+                    <Route element={<Transaction />} path="transaction" />
 
-                    <Route element={<PermissionRoute />} path="/admin/*">
+                    <Route element={<PermissionRoute />} path="admin/*">
                         <Route element={<AdminBillingDetail />} path="bill" />
                         <Route element={<AdminInvoice />} path="invoice-check"/>
                         <Route element={<AdminPaymentMethod />} path="payment" />
