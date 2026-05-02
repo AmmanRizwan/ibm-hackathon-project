@@ -9,7 +9,7 @@ router.route("/signup").post(signUp);
 router.route("/signup/verify").post(signUpVerify);
 router.route("/signup/resend").post(signUpResendOtp);
 router.route("/forgot-password").post(forgetEmail);
-router.route("/forgot-password/verify").post(forgetVerify);
-router.route("/forgot-password/resend").post(forgetVerifyOtp);
+router.route("/forgot-password/update").post(forgetVerify);
+router.route("/forgot-password/verify").post(forgetVerifyOtp);
 
 export default router;
