@@ -314,6 +314,7 @@ export const signUpResendOtp = async (req: Request, res: Response, next: NextFun
             context: {
                 name: user.dataValues.name,
                 otp,
+                email: user.dataValues.email
             }
         });
 
@@ -378,6 +379,7 @@ export const forgetEmail = async (req: Request, res: Response, next: NextFunctio
             context: {
                 name: user.dataValues.name,
                 otp,
+                email: user.dataValues.email
             }
         });
 
