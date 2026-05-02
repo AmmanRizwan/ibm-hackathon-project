@@ -34,7 +34,7 @@ app.get("/health", (req: Request, res: Response) => {
 app.use("/v1/api", Router);
 app.use(errorHandler);
 
-cron.schedule("* * * * *", async () => {
+cron.schedule("0 0 1 * *", async () => {
   logger.info("Running task every minute...");
   await sendReminder();
 })
