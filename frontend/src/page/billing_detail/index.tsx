@@ -1,22 +1,51 @@
+import { useEffect, useState } from 'react';
 import { MapPin, Building2, Map, Navigation } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { getUserBillingDetails } from '@/service/billing_details';
+import PageLoader from '@/components/custom/page-loader';
+import { Alert } from '@/components/ui/alert';
 
-// Sample/Random billing details data
-const sampleBillingDetails = [
-    {
-        id: 1,
-        address: '123 Main Street, Apartment 4B, Downtown',
-        pin: '400001',
-        city: 'Mumbai',
-        state: 'Maharashtra',
-    }
-];
+interface BillingDetailType {
+    id: string;
+    address: string;
+    pin: string;
+    city: string;
+    state: string;
+    isVerify: boolean;
+    userId: string;
+    createdAt: string;
+    updatedAt: string;
+}
 
 const BillingDetail = () => {
+    const navigate = useNavigate();
+    const [billingDetails, setBillingDetails] = useState<BillingDetailType[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    useEffect(() => {
+        fetchBillingDetails();
+    }, []);
+
+    const fetchBillingDetails = async () => {
+        setIsLoading(true);
+        setErrorMessage('');
+        try {
+            const response = await getUserBillingDetails();
+            setBillingDetails(response.data || []);
+        } catch (error: any) {
+            setErrorMessage(error.response?.data?.message || 'Failed to fetch billing details');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="mx-auto py-8 px-4 max-w-4xl">
+            <PageLoader isLoading={isLoading} />
+            
             <div className="mb-6 flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold">Billing Details</h1>
@@ -24,13 +53,23 @@ const BillingDetail = () => {
                         Manage your billing addresses
                     </p>
                 </div>
-                <Button className="border hover:shadow">
-                    Add Address
-                </Button>
+                {/* Hide Add Address button if billing detail already exists */}
+                {billingDetails.length === 0 && !isLoading && (
+                    <Button className="border hover:shadow" onClick={() => navigate('new')}>
+                        Add Address
+                    </Button>
+                )}
             </div>
 
+            {/* Error Message */}
+            {errorMessage && (
+                <Alert className="mb-6 bg-red-50 border-red-200">
+                    <p className="text-red-800">{errorMessage}</p>
+                </Alert>
+            )}
+
             <div className="grid gap-6">
-                {sampleBillingDetails.map((detail) => (
+                {billingDetails.map((detail) => (
                     <Card key={detail.id} className="relative">
                         <CardHeader>
                             <div className="flex justify-between items-start">
@@ -96,7 +135,7 @@ const BillingDetail = () => {
             </div>
 
             {/* Empty State (if no billing details) */}
-            {sampleBillingDetails.length === 0 && (
+            {billingDetails.length === 0 && !isLoading && !errorMessage && (
                 <Card>
                     <CardContent className="py-12 text-center">
                         <MapPin className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -106,7 +145,7 @@ const BillingDetail = () => {
                         <p className="text-muted-foreground mb-6">
                             Add your first billing address to get started
                         </p>
-                        <Button>Add Billing Address</Button>
+                        <Button onClick={() => navigate('new')}>Add Billing Address</Button>
                     </CardContent>
                 </Card>
             )}

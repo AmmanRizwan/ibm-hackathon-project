@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import {
   Eye,
   EyeOff,
@@ -30,6 +31,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import PageLoader from "@/components/custom/page-loader";
+import { forgetEmail, forgetVerifyOtp, forgetVerify } from "@/service/auth";
 
 interface ForgotPasswordFormValues {
     email: string;
@@ -47,10 +49,12 @@ const defaultValues: Partial<ForgotPasswordFormValues> = {
 };
 
 export default function ForgotPasswordPage() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [isPasswordReset, setIsPasswordReset] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<ForgotPasswordFormValues>({
     defaultValues,
@@ -58,20 +62,82 @@ export default function ForgotPasswordPage() {
 
   const steps = ["Enter Email", "Verify OTP", "Reset Password", "Success"];
 
-  const onEmailSubmit = async () => {
-    setCurrentStep(1);
+  const onEmailSubmit = async (data: ForgotPasswordFormValues) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await forgetEmail({ email: data.email });
+      setCurrentStep(1);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to send OTP. Please try again.");
+      console.error("Email submission error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const onOtpVerification = async () => {
-    setCurrentStep(2);
+  const onOtpVerification = async (data: ForgotPasswordFormValues) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await forgetVerifyOtp({
+        email: data.email,
+        otp: data.otp
+      });
+      setCurrentStep(2);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Invalid OTP. Please try again.");
+      console.error("OTP verification error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const onResetPassword = async () => {
-    setIsPasswordReset(true);
-    setCurrentStep(3);
+  const onResetPassword = async (data: ForgotPasswordFormValues) => {
+    if (data.password !== data.confirmPassword) {
+      setError("Passwords do not match!");
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      await forgetVerify({
+        email: data.email,
+        otp: data.otp,
+        newPassword: data.password
+      });
+      setIsPasswordReset(true);
+      setCurrentStep(3);
+    } catch (err: any) {
+      setIsPasswordReset(false);
+      setError(err.response?.data?.message || "Failed to reset password. Please try again.");
+      console.error("Password reset error:", err);
+      setCurrentStep(3);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onRequestForgotPasswordOtp = async () => {
+    const email = form.getValues("email");
+    if (!email) {
+      setError("Email is required to resend OTP");
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      await forgetEmail({ email });
+      setError(null);
+      // Show success message (you could add a success state if needed)
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to resend OTP. Please try again.");
+      console.error("Resend OTP error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderStepContent = () => {
@@ -85,6 +151,11 @@ export default function ForgotPasswordPage() {
               })}
               className="space-y-4"
             >
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded relative text-sm">
+                  {error}
+                </div>
+              )}
               <FormField
                 control={form.control}
                 name="email"
@@ -136,6 +207,11 @@ export default function ForgotPasswordPage() {
               onSubmit={form.handleSubmit(onOtpVerification)}
               className="space-y-4"
             >
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded relative text-sm">
+                  {error}
+                </div>
+              )}
               <div className="text-center mb-4">
                 <p className="text-sm text-muted-foreground">
                   We've sent a 6-digit OTP to your {form.getValues("email")}.
@@ -168,7 +244,10 @@ export default function ForgotPasswordPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setCurrentStep(0)}
+                  onClick={() => {
+                    setError(null);
+                    setCurrentStep(0);
+                  }}
                   disabled={isLoading}
                   className="hover:cursor-pointer"
                 >
@@ -217,6 +296,11 @@ export default function ForgotPasswordPage() {
               })}
               className="space-y-4"
             >
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded relative text-sm">
+                  {error}
+                </div>
+              )}
               <FormField
                 control={form.control}
                 name="password"
@@ -329,6 +413,7 @@ export default function ForgotPasswordPage() {
                 </div>
                 <Button
                   className="border hover:shadow w-full hover:cursor-pointer"
+                  onClick={() => navigate("/auth/login")}
                 >
                   Go to Login
                 </Button>
@@ -343,12 +428,14 @@ export default function ForgotPasswordPage() {
                     Password Reset Failed
                   </h3>
                   <p className="text-muted-foreground mt-2">
-                    There was an error resetting your password. Please try
-                    again.
+                    {error || "There was an error resetting your password. Please try again."}
                   </p>
                 </div>
                 <Button
-                  onClick={() => setCurrentStep(2)}
+                  onClick={() => {
+                    setError(null);
+                    setCurrentStep(2);
+                  }}
                   className="border hover:shadow w-full hover:cursor-pointer"
                 >
                   Try Again

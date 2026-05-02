@@ -1,15 +1,13 @@
-import type { RootState } from "@/store"
-import { useSelector } from "react-redux"
 import { Navigate, Outlet } from "react-router-dom"
 
 const AutoRedirect = () => {
-    const { token } = useSelector((state: RootState) => state.auth);
+    const token = localStorage.getItem("token");
 
     if (token) {
-        return <Navigate to={"/auth/login"} replace />
+        return <Navigate to={"/user/profile"} replace />
     }
 
-    return <Outlet />
+    return <Outlet />;
 }
 
 export default AutoRedirect;

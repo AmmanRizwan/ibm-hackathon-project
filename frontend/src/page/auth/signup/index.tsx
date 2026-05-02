@@ -78,7 +78,11 @@ export default function SignUpPage() {
   // Verify OTP mutation
   const verifyOtpMutation = useMutation({
     mutationFn: (payload: ISignUpVerify) => signUpVerify(payload),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log(data.data.token);
+      if (data.data.token) {
+        localStorage.setItem("token", data.data.token);
+      }
       navigate("/user/profile");
     },
     onError: (error: any) => {

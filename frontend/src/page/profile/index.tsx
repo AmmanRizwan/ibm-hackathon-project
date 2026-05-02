@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { User, Mail, Phone, Lock, Edit2, X, Check, Shield } from 'lucide-react';
+import { User, Mail, Phone, Lock, Edit2, X, Check, Shield, LogOut } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +25,7 @@ import { Alert } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PageLoader from '@/components/custom/page-loader';
 import { getMe, updateUserDetail } from '@/service/user';
-import { setUser } from '@/store/auth';
+import { setUser, removeUser, removeToken } from '@/store/auth';
 
 interface ProfileFormValues {
     name: string;
@@ -38,6 +39,7 @@ interface PasswordFormValues {
 
 const Profile = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const user = useSelector((state: any) => state.auth.user);
     const [isLoading, setIsLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
@@ -149,6 +151,18 @@ const Profile = () => {
         setSuccessMessage('');
     };
 
+    const handleLogout = () => {
+        // Remove token from localStorage
+        localStorage.removeItem('token');
+        
+        // Clear Redux store
+        dispatch(removeUser());
+        dispatch(removeToken());
+        
+        // Navigate to home page
+        navigate('/');
+    };
+
     const isAdmin = user?.role === 'admin';
 
     return (
@@ -164,12 +178,23 @@ const Profile = () => {
                             Manage your account settings and preferences
                         </p>
                     </div>
-                    {isAdmin && (
-                        <Badge variant="default" className="flex items-center gap-1 px-3 py-1">
-                            <Shield className="h-4 w-4" />
-                            Admin
-                        </Badge>
-                    )}
+                    <div className="flex items-center gap-3">
+                        {isAdmin && (
+                            <Badge variant="default" className="flex items-center gap-1 px-3 py-1">
+                                <Shield className="h-4 w-4" />
+                                Admin
+                            </Badge>
+                        )}
+                        <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={handleLogout}
+                            className="hover:cursor-pointer text-white bg-red-400 hover:bg-red-500 flex items-center gap-2"
+                        >
+                            <LogOut className="h-4 w-4" />
+                            Logout
+                        </Button>
+                    </div>
                 </div>
             </div>
 

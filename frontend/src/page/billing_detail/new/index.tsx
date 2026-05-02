@@ -60,7 +60,7 @@ const CreateBillingDetail = () => {
 
             // Navigate back to billing details list
             setTimeout(() => {
-                navigate('/billing-details');
+                navigate('/user/billing_detail');
             }, 1500);
         } catch (error: any) {
             setErrorMessage(error.response?.data?.message || 'Failed to create billing detail');
@@ -71,7 +71,7 @@ const CreateBillingDetail = () => {
     };
 
     const handleCancel = () => {
-        navigate('/billing-details');
+        navigate('/user/billing_detail');
     };
 
     return (

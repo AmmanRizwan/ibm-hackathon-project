@@ -4,6 +4,7 @@ import Login from "./auth/login";
 import SignUp from "./auth/signup";
 import ForgotPassword from "./auth/forgot-password";
 import ProtectedRoute from "@/utils/ProtectedRoute";
+import AutoRedirect from "@/utils/AutoRedirect";
 import Profile from "./profile";
 import BillingDetail from "./billing_detail";
 import PaymentMethod from "./payment_method";
@@ -39,11 +40,13 @@ const LayoutContent = () => {
             <main className={shouldShowSidebar ? 'lg:ml-64' : ''}>
                 <div>
                     <Routes>
-                        <Route element={<Home />} path="/" />
+                        <Route element={<AutoRedirect />}>
+                            <Route element={<Home />} path="/" />
+                            <Route element={<Login />} path="/auth/login" />
+                            <Route element={<SignUp />} path="/auth/signup"/>
+                            <Route element={<ForgotPassword />} path="/auth/forgot-password" />
+                        </Route>
                         
-                        <Route element={<Login />} path="/auth/login" />
-                        <Route element={<SignUp />} path="/auth/signup"/>
-                        <Route element={<ForgotPassword />} path="/auth/forgot-password" />
                         
                         <Route element={<ProtectedRoute />} path="/user/*">
                         

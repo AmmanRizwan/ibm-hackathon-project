@@ -70,7 +70,7 @@ const CreatePaymentMethod = () => {
 
             // Navigate back to payment methods list
             setTimeout(() => {
-                navigate('/payment-methods');
+                navigate('/user/payment-method');
             }, 1500);
         } catch (error: any) {
             setErrorMessage(error.response?.data?.message || 'Failed to create payment method');
@@ -81,7 +81,7 @@ const CreatePaymentMethod = () => {
     };
 
     const handleCancel = () => {
-        navigate('/payment-methods');
+        navigate('/user/payment-method');
     };
 
     return (

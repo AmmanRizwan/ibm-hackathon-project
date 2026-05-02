@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CreditCard, Building2, User, Hash, CheckCircle, XCircle, Plus } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ interface PaymentMethodData {
 }
 
 const PaymentMethod = () => {
+    const navigate = useNavigate();
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethodData[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -57,10 +59,15 @@ const PaymentMethod = () => {
                         Manage your bank account details
                     </p>
                 </div>
-                <Button className="border hover:shadow">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Payment Method
-                </Button>
+                {paymentMethods.length === 0 && (
+                    <Button
+                        className="border hover:shadow"
+                        onClick={() => navigate('new')}
+                    >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Payment Method
+                    </Button>
+                )}
             </div>
 
             <div className="grid gap-6">
@@ -86,7 +93,7 @@ const PaymentMethod = () => {
                                     ) : (
                                         <>
                                             <XCircle className="h-3 w-3 mr-1" />
-                                            Unverified
+                                            Pending
                                         </>
                                     )}
                                 </Badge>
@@ -145,7 +152,7 @@ const PaymentMethod = () => {
                         <p className="text-muted-foreground mb-6">
                             Add your first payment method to get started
                         </p>
-                        <Button>
+                        <Button onClick={() => navigate('new')}>
                             <Plus className="h-4 w-4 mr-2" />
                             Add Payment Method
                         </Button>

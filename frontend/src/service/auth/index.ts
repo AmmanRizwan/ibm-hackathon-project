@@ -41,12 +41,12 @@ const forgetEmail = async (payload: IForgetEmail) => {
 }
 
 const forgetVerifyOtp = async (payload: IForgetVerifyOtp) => {
-    const response = await api.post(`/auth/forgot-password/resend`, payload);
+    const response = await api.post(`/auth/forgot-password/verify`, payload);
     return response.data;
 }
 
 const forgetVerify = async (payload: IForgetVerify) => {
-    const response = await api.post(`/auth/forgot-password/verify`, payload);
+    const response = await api.post(`/auth/forgot-password/update`, payload);
     return response.data;
 }
 

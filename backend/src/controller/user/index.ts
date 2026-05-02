@@ -115,10 +115,24 @@ export const getAllUsers = async (
             return throwCustomError(401, "Unauthorized");
         }
 
-        // Get all users except admins
+        // Get all users except admins with their billing details and payment methods
         const users = await User.findAll({
             where: { role: "user" },
             attributes: { exclude: ["password"] },
+            include: [
+                {
+                    model: BillingDetail,
+                    as: "billingDetails",
+                    required: false,
+                    attributes: ["id", "address", "pin", "city", "state", "isVerify", "createdAt", "updatedAt"]
+                },
+                {
+                    model: PaymentMethod,
+                    as: "paymentMethods",
+                    required: false,
+                    attributes: ["id", "bank_name", "account_holder_name", "account_number", "ifsc", "account_type", "isVerify", "createdAt", "updatedAt"]
+                }
+            ],
             order: [["createdAt", "DESC"]]
         });
 
