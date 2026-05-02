@@ -308,7 +308,10 @@ const AdminInvoice = () => {
                             <CardDescription>Total Amount</CardDescription>
                             <CardTitle className="text-2xl">
                                 {formatCurrency(
-                                    invoices.reduce((sum, inv) => sum + inv.total_amount, 0)
+                                    invoices.reduce((sum, inv) => {
+                                        const amount = Number(inv.total_amount);
+                                        return sum + (isNaN(amount) ? 0 : amount);
+                                    }, 0)
                                 )}
                             </CardTitle>
                         </CardHeader>

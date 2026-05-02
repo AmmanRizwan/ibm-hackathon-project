@@ -17,7 +17,7 @@ interface SendEmailOptions {
     to: string | string[],
     subject: string,
     template: string,
-    context: Record<string, string>,
+    context: Record<string, any>,
 }
 
 async function sendEmail(options: SendEmailOptions) {

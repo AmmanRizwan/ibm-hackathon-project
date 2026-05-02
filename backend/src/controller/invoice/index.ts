@@ -235,15 +235,36 @@ export const createInvoice = async (
                     subject: `Invoice ${invoice_number} - ${customer_name}`,
                     template: "invoice/invoice",
                     context: {
-                        invoice_number: invoice_number,
-                        invoice_date: invoice_date || new Date().toISOString(),
-                        customer_name: customer_name,
-                        customer_email: customer_email || "",
-                        customer_phone: customer_phone || "",
-                        total_amount: total_amount.toString(),
-                        payment_status: payment_status || "pending",
-                        notes: notes || "",
-                        status: status || "draft"
+                        // Invoice header information
+                        invoiceNumber: invoice_number,
+                        invoiceDate: invoice_date ? new Date(invoice_date).toLocaleDateString('en-US') : new Date().toLocaleDateString('en-US'),
+                        dueDate: new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('en-US'),
+                        status: status || "draft",
+                        
+                        // Bill To information
+                        billTo: {
+                            name: customer_name,
+                            email: customer_email || "",
+                            phone: customer_phone || "",
+                            address: "", // Not available in current schema
+                            city: "",    // Not available in current schema
+                            state: "",   // Not available in current schema
+                            zip: ""      // Not available in current schema
+                        },
+                        
+                        // Totals
+                        subtotal: total_amount.toString(),
+                        total: total_amount.toString(),
+                        tax: null,
+                        taxRate: null,
+                        discount: null,
+                        
+                        // Payment information
+                        paymentMethod: null,
+                        bankDetails: null,
+                        
+                        // Notes
+                        notes: notes || ""
                     }
                 });
             } catch (emailError) {
@@ -373,6 +394,138 @@ export const deleteInvoice = async (
         res.status(200).json({
             message: "Invoice deleted successfully!",
             data: { id }
+        });
+    }
+    catch (err) {
+        await transaction.rollback();
+        next(err);
+    }
+}
+
+// Admin: Create invoice for any user
+export const adminCreateInvoice = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const transaction = await sequelize.transaction();
+    try {
+        const {
+            invoice_number,
+            invoice_date,
+            customer_name,
+            customer_email,
+            customer_phone,
+            total_amount,
+            payment_status,
+            notes,
+            status,
+            userId
+        } = req.body;
+
+        // Validate required fields
+        if (!invoice_number || !customer_name || !total_amount || !userId) {
+            return throwCustomError(400, "Invoice number, customer name, total amount, and userId are required!");
+        }
+
+        // Verify that the user exists
+        const user = await User.findByPk(userId);
+        if (!user) {
+            await transaction.rollback();
+            return throwCustomError(404, "User not found!");
+        }
+
+        // Check if invoice number already exists
+        const existingInvoice = await Invoice.findOne({
+            where: { invoice_number },
+            transaction
+        });
+
+        if (existingInvoice) {
+            await transaction.rollback();
+            return throwCustomError(400, "Invoice number already exists!");
+        }
+
+        // Create invoice for the specified user
+        const invoice = await Invoice.create(
+            {
+                invoice_number,
+                invoice_date: invoice_date || new Date(),
+                customer_name,
+                customer_email,
+                customer_phone,
+                total_amount,
+                payment_status: payment_status || "pending",
+                notes,
+                status: status || "draft",
+                userId
+            },
+            { transaction }
+        );
+
+        await transaction.commit();
+
+        // Fetch the created invoice with user information
+        const createdInvoice = await Invoice.findOne({
+            where: { id: invoice.get("id") },
+            include: [
+                {
+                    model: User,
+                    as: "user",
+                    attributes: ["id", "name", "email", "phone"]
+                }
+            ]
+        });
+
+        // Send email to customer if email is provided
+        if (customer_email) {
+            try {
+                await sendEmail({
+                    to: customer_email,
+                    subject: `Invoice ${invoice_number} - ${customer_name}`,
+                    template: "invoice/invoice",
+                    context: {
+                        // Invoice header information
+                        invoiceNumber: invoice_number,
+                        invoiceDate: invoice_date ? new Date(invoice_date).toLocaleDateString('en-US') : new Date().toLocaleDateString('en-US'),
+                        dueDate: new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('en-US'),
+                        status: status || "draft",
+                        
+                        // Bill To information
+                        billTo: {
+                            name: customer_name,
+                            email: customer_email || "",
+                            phone: customer_phone || "",
+                            address: "",
+                            city: "",
+                            state: "",
+                            zip: ""
+                        },
+                        
+                        // Totals
+                        subtotal: total_amount.toString(),
+                        total: total_amount.toString(),
+                        tax: null,
+                        taxRate: null,
+                        discount: null,
+                        
+                        // Payment information
+                        paymentMethod: null,
+                        bankDetails: null,
+                        
+                        // Notes
+                        notes: notes || ""
+                    }
+                });
+            } catch (emailError) {
+                // Log email error but don't fail the invoice creation
+                console.error("Failed to send invoice email:", emailError);
+            }
+        }
+
+        res.status(201).json({
+            message: "Invoice created successfully!",
+            data: createdInvoice
         });
     }
     catch (err) {

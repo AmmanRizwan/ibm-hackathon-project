@@ -107,7 +107,7 @@ export const createTransaction = async (
         } = req.body;
 
         // Validate required fields
-        if (!payer_bank_account_id || !payee_bank_account_id || !payer_name || 
+        if (!payee_bank_account_id || !payer_name ||
             !payer_email || !payee_name || !payee_email || !invoiceId || !amount) {
             return throwCustomError(400, "All required fields must be provided!");
         }

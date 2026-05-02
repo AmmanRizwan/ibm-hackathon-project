@@ -12,7 +12,6 @@ const Invoice = sequelize.define(
         invoice_number: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true,
         },
         invoice_date: {
             type: DataTypes.DATE,

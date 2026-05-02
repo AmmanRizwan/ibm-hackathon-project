@@ -22,165 +22,10 @@ interface GroupedTransactions {
     [key: string]: ITransaction[];
 }
 
-// Mock transaction data for testing
-const MOCK_TRANSACTIONS: ITransaction[] = [
-    {
-        _id: '507f1f77bcf86cd799439011',
-        payer_bank_account_id: 'BA001',
-        payee_bank_account_id: 'BA002',
-        payer_name: 'John Smith',
-        payer_email: 'john.smith@example.com',
-        payee_name: 'Acme Corporation',
-        payee_email: 'billing@acme.com',
-        invoiceId: 'INV-2024-001',
-        amount: 1250.00,
-        transaction_date: '2024-04-15T10:30:00Z',
-        status: 'completed',
-        createdAt: '2024-04-15T10:30:00Z',
-        updatedAt: '2024-04-15T10:30:00Z',
-    },
-    {
-        _id: '507f1f77bcf86cd799439012',
-        payer_bank_account_id: 'BA003',
-        payee_bank_account_id: 'BA004',
-        payer_name: 'Sarah Johnson',
-        payer_email: 'sarah.j@company.com',
-        payee_name: 'Tech Solutions Inc',
-        payee_email: 'payments@techsolutions.com',
-        invoiceId: 'INV-2024-002',
-        amount: 3500.50,
-        transaction_date: '2024-04-20T14:45:00Z',
-        status: 'pending',
-        createdAt: '2024-04-20T14:45:00Z',
-        updatedAt: '2024-04-20T14:45:00Z',
-    },
-    {
-        _id: '507f1f77bcf86cd799439013',
-        payer_bank_account_id: 'BA005',
-        payee_bank_account_id: 'BA006',
-        payer_name: 'Michael Brown',
-        payer_email: 'mbrown@business.com',
-        payee_name: 'Global Services Ltd',
-        payee_email: 'finance@globalservices.com',
-        invoiceId: 'INV-2024-003',
-        amount: 875.25,
-        transaction_date: '2024-04-22T09:15:00Z',
-        status: 'completed',
-        createdAt: '2024-04-22T09:15:00Z',
-        updatedAt: '2024-04-22T09:15:00Z',
-    },
-    {
-        _id: '507f1f77bcf86cd799439014',
-        payer_bank_account_id: 'BA007',
-        payee_bank_account_id: 'BA008',
-        payer_name: 'Emily Davis',
-        payer_email: 'emily.davis@startup.io',
-        payee_name: 'Cloud Hosting Pro',
-        payee_email: 'billing@cloudhosting.com',
-        invoiceId: 'INV-2024-004',
-        amount: 299.99,
-        transaction_date: '2024-03-28T16:20:00Z',
-        status: 'failed',
-        createdAt: '2024-03-28T16:20:00Z',
-        updatedAt: '2024-03-28T16:20:00Z',
-    },
-    {
-        _id: '507f1f77bcf86cd799439015',
-        payer_bank_account_id: 'BA009',
-        payee_bank_account_id: 'BA010',
-        payer_name: 'David Wilson',
-        payer_email: 'dwilson@enterprise.com',
-        payee_name: 'Marketing Agency Plus',
-        payee_email: 'accounts@marketingplus.com',
-        invoiceId: 'INV-2024-005',
-        amount: 5200.00,
-        transaction_date: '2024-03-15T11:00:00Z',
-        status: 'completed',
-        createdAt: '2024-03-15T11:00:00Z',
-        updatedAt: '2024-03-15T11:00:00Z',
-    },
-    {
-        _id: '507f1f77bcf86cd799439016',
-        payer_bank_account_id: 'BA011',
-        payee_bank_account_id: 'BA012',
-        payer_name: 'Lisa Anderson',
-        payer_email: 'lisa.a@consulting.com',
-        payee_name: 'Office Supplies Co',
-        payee_email: 'sales@officesupplies.com',
-        invoiceId: 'INV-2024-006',
-        amount: 450.75,
-        transaction_date: '2024-03-10T13:30:00Z',
-        status: 'completed',
-        createdAt: '2024-03-10T13:30:00Z',
-        updatedAt: '2024-03-10T13:30:00Z',
-    },
-    {
-        _id: '507f1f77bcf86cd799439017',
-        payer_bank_account_id: 'BA013',
-        payee_bank_account_id: 'BA014',
-        payer_name: 'Robert Taylor',
-        payer_email: 'rtaylor@finance.com',
-        payee_name: 'Legal Services Group',
-        payee_email: 'billing@legalservices.com',
-        invoiceId: 'INV-2024-007',
-        amount: 2800.00,
-        transaction_date: '2024-02-25T10:00:00Z',
-        status: 'pending',
-        createdAt: '2024-02-25T10:00:00Z',
-        updatedAt: '2024-02-25T10:00:00Z',
-    },
-    {
-        _id: '507f1f77bcf86cd799439018',
-        payer_bank_account_id: 'BA015',
-        payee_bank_account_id: 'BA016',
-        payer_name: 'Jennifer Martinez',
-        payer_email: 'jmartinez@retail.com',
-        payee_name: 'Shipping Solutions',
-        payee_email: 'payments@shippingsolutions.com',
-        invoiceId: 'INV-2024-008',
-        amount: 1150.50,
-        transaction_date: '2024-02-18T15:45:00Z',
-        status: 'completed',
-        createdAt: '2024-02-18T15:45:00Z',
-        updatedAt: '2024-02-18T15:45:00Z',
-    },
-    {
-        _id: '507f1f77bcf86cd799439019',
-        payer_bank_account_id: 'BA017',
-        payee_bank_account_id: 'BA018',
-        payer_name: 'Christopher Lee',
-        payer_email: 'clee@manufacturing.com',
-        payee_name: 'Equipment Rentals Inc',
-        payee_email: 'billing@equipmentrentals.com',
-        invoiceId: 'INV-2024-009',
-        amount: 4500.00,
-        transaction_date: '2024-02-05T09:30:00Z',
-        status: 'cancelled',
-        createdAt: '2024-02-05T09:30:00Z',
-        updatedAt: '2024-02-05T09:30:00Z',
-    },
-    {
-        _id: '507f1f77bcf86cd799439020',
-        payer_bank_account_id: 'BA019',
-        payee_bank_account_id: 'BA020',
-        payer_name: 'Amanda White',
-        payer_email: 'awhite@healthcare.com',
-        payee_name: 'Medical Supplies Direct',
-        payee_email: 'orders@medicalsupplies.com',
-        invoiceId: 'INV-2024-010',
-        amount: 6750.25,
-        transaction_date: '2024-01-30T12:00:00Z',
-        status: 'completed',
-        createdAt: '2024-01-30T12:00:00Z',
-        updatedAt: '2024-01-30T12:00:00Z',
-    },
-];
-
 const AdminTransaction = () => {
     const [transactions, setTransactions] = useState<ITransaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [useMockData, setUseMockData] = useState(false);
 
     useEffect(() => {
         fetchTransactions();
@@ -191,32 +36,11 @@ const AdminTransaction = () => {
             setLoading(true);
             setError(null);
             const response = await getAllTransactions({ limit: 1000 });
-            const fetchedTransactions = response.data.transactions || [];
-            
-            // Use mock data if no transactions are returned
-            if (fetchedTransactions.length === 0) {
-                setTransactions(MOCK_TRANSACTIONS);
-                setUseMockData(true);
-            } else {
-                setTransactions(fetchedTransactions);
-                setUseMockData(false);
-            }
+            setTransactions(response.data.transactions || []);
         } catch (err: any) {
-            // Use mock data on error for testing
-            setTransactions(MOCK_TRANSACTIONS);
-            setUseMockData(true);
-            setError(null); // Clear error when using mock data
+            setError(err.response?.data?.message || 'Failed to fetch transactions');
         } finally {
             setLoading(false);
-        }
-    };
-
-    const toggleMockData = () => {
-        if (useMockData) {
-            fetchTransactions();
-        } else {
-            setTransactions(MOCK_TRANSACTIONS);
-            setUseMockData(true);
         }
     };
 
@@ -330,22 +154,15 @@ const AdminTransaction = () => {
                             View and manage all transactions grouped by month
                         </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                        {useMockData && (
-                            <Badge variant="secondary" className="text-xs">
-                                Mock Data
-                            </Badge>
-                        )}
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={toggleMockData}
-                            className="gap-2"
-                        >
-                            <RefreshCw className="h-4 w-4" />
-                            {useMockData ? 'Load Real Data' : 'Use Mock Data'}
-                        </Button>
-                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={fetchTransactions}
+                        className="gap-2"
+                    >
+                        <RefreshCw className="h-4 w-4" />
+                        Refresh
+                    </Button>
                 </div>
 
                 {/* Summary Cards */}

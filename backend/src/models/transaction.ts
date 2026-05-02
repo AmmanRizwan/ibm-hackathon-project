@@ -10,20 +10,12 @@ const Transaction = sequelize.define(
             primaryKey: true,
         },
         payer_bank_account_id: {
-            type: DataTypes.UUID,
-            allowNull: false,
-            references: {
-                model: "payment_methods",
-                key: "id",
-            }
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         payee_bank_account_id: {
-            type: DataTypes.UUID,
+            type: DataTypes.STRING,
             allowNull: false,
-            references: {
-                model: "payment_methods",
-                key: "id",
-            }
         },
         payer_name: {
             type: DataTypes.STRING,
@@ -42,12 +34,8 @@ const Transaction = sequelize.define(
             allowNull: false,
         },
         invoiceId: {
-            type: DataTypes.UUID,
+            type: DataTypes.STRING,
             allowNull: false,
-            references: {
-                model: "invoices",
-                key: "id",
-            }
         },
         amount: {
             type: DataTypes.DECIMAL(10, 2),

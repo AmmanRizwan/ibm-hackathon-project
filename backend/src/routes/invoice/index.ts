@@ -6,6 +6,7 @@ import {
     createInvoice,
     updateInvoice,
     deleteInvoice,
+    adminCreateInvoice,
     adminUpdateInvoice,
     adminDeleteInvoice
 } from "../../controller/invoice";
@@ -16,6 +17,7 @@ const router = Router();
 
 // Admin routes - require authentication and admin permission
 router.route("/admin").get(authenticate, permission, getAllInvoices);
+router.route("/admin").post(authenticate, permission, adminCreateInvoice);
 router.route("/admin/:id").put(authenticate, permission, adminUpdateInvoice);
 router.route("/admin/:id").delete(authenticate, permission, adminDeleteInvoice);
 

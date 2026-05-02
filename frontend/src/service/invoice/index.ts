@@ -1,7 +1,8 @@
 import api from "../api";
-import type { 
-    ICreateInvoice, 
-    IUpdateInvoice, 
+import type {
+    ICreateInvoice,
+    IAdminCreateInvoice,
+    IUpdateInvoice,
     IGetAllInvoicesQuery,
     IGetUserInvoicesQuery
 } from "./interface";
@@ -38,6 +39,12 @@ const createInvoice = async (payload: ICreateInvoice) => {
     return response.data;
 }
 
+// Admin: Create invoice for any user
+const adminCreateInvoice = async (payload: IAdminCreateInvoice) => {
+    const response = await api.post(`/invoice/admin`, payload);
+    return response.data;
+}
+
 // User: Update invoice
 const updateInvoice = async (id: string, payload: IUpdateInvoice) => {
     const response = await api.put(`/invoice/${id}`, payload);
@@ -67,6 +74,7 @@ export {
     getUserInvoices,
     getInvoiceById,
     createInvoice,
+    adminCreateInvoice,
     updateInvoice,
     deleteInvoice,
     adminUpdateInvoice,

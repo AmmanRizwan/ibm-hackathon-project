@@ -10,176 +10,10 @@ import {
     DialogTitle,
     DialogDescription,
 } from '@/components/ui/dialog';
+import { getUserTransactions } from '@/service/transaction';
+import type { ITransaction } from '@/service/transaction/interface';
 
-interface Transaction {
-    _id: string;
-    payer_bank_account_id: string;
-    payee_bank_account_id: string;
-    payer_name: string;
-    payer_email: string;
-    payee_name: string;
-    payee_email: string;
-    invoiceId: string;
-    amount: number;
-    transaction_date: string;
-    status: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
-// Mock transaction data
-const mockTransactions: Transaction[] = [
-    {
-        _id: '1',
-        payer_bank_account_id: 'BA-2024-001',
-        payee_bank_account_id: 'BA-2024-002',
-        payer_name: 'John Doe',
-        payer_email: 'john.doe@example.com',
-        payee_name: 'Acme Corporation',
-        payee_email: 'billing@acme.com',
-        invoiceId: 'INV-2024-001',
-        amount: 1250.00,
-        transaction_date: '2024-01-15T10:30:00Z',
-        status: 'completed',
-        createdAt: '2024-01-15T10:30:00Z',
-        updatedAt: '2024-01-15T10:35:00Z',
-    },
-    {
-        _id: '2',
-        payer_bank_account_id: 'BA-2024-003',
-        payee_bank_account_id: 'BA-2024-004',
-        payer_name: 'Jane Smith',
-        payer_email: 'jane.smith@example.com',
-        payee_name: 'Tech Solutions Inc',
-        payee_email: 'payments@techsolutions.com',
-        invoiceId: 'INV-2024-002',
-        amount: 3500.50,
-        transaction_date: '2024-01-16T14:20:00Z',
-        status: 'pending',
-        createdAt: '2024-01-16T14:20:00Z',
-        updatedAt: '2024-01-16T14:20:00Z',
-    },
-    {
-        _id: '3',
-        payer_bank_account_id: 'BA-2024-005',
-        payee_bank_account_id: 'BA-2024-006',
-        payer_name: 'Robert Johnson',
-        payer_email: 'robert.j@example.com',
-        payee_name: 'Global Services Ltd',
-        payee_email: 'finance@globalservices.com',
-        invoiceId: 'INV-2024-003',
-        amount: 875.25,
-        transaction_date: '2024-01-17T09:15:00Z',
-        status: 'completed',
-        createdAt: '2024-01-17T09:15:00Z',
-        updatedAt: '2024-01-17T09:20:00Z',
-    },
-    {
-        _id: '4',
-        payer_bank_account_id: 'BA-2024-007',
-        payee_bank_account_id: 'BA-2024-008',
-        payer_name: 'Emily Davis',
-        payer_email: 'emily.davis@example.com',
-        payee_name: 'Creative Agency',
-        payee_email: 'accounts@creativeagency.com',
-        invoiceId: 'INV-2024-004',
-        amount: 2100.00,
-        transaction_date: '2024-01-18T11:45:00Z',
-        status: 'failed',
-        createdAt: '2024-01-18T11:45:00Z',
-        updatedAt: '2024-01-18T11:50:00Z',
-    },
-    {
-        _id: '5',
-        payer_bank_account_id: 'BA-2024-009',
-        payee_bank_account_id: 'BA-2024-010',
-        payer_name: 'Michael Brown',
-        payer_email: 'michael.brown@example.com',
-        payee_name: 'Consulting Group',
-        payee_email: 'billing@consultinggroup.com',
-        invoiceId: 'INV-2024-005',
-        amount: 5250.75,
-        transaction_date: '2024-01-19T16:30:00Z',
-        status: 'completed',
-        createdAt: '2024-01-19T16:30:00Z',
-        updatedAt: '2024-01-19T16:35:00Z',
-    },
-    {
-        _id: '6',
-        payer_bank_account_id: 'BA-2024-011',
-        payee_bank_account_id: 'BA-2024-012',
-        payer_name: 'Sarah Wilson',
-        payer_email: 'sarah.wilson@example.com',
-        payee_name: 'Marketing Pro',
-        payee_email: 'payments@marketingpro.com',
-        invoiceId: 'INV-2024-006',
-        amount: 1800.00,
-        transaction_date: '2024-01-20T13:00:00Z',
-        status: 'pending',
-        createdAt: '2024-01-20T13:00:00Z',
-        updatedAt: '2024-01-20T13:00:00Z',
-    },
-    {
-        _id: '7',
-        payer_bank_account_id: 'BA-2024-013',
-        payee_bank_account_id: 'BA-2024-014',
-        payer_name: 'David Martinez',
-        payer_email: 'david.martinez@example.com',
-        payee_name: 'Software Solutions',
-        payee_email: 'finance@softwaresolutions.com',
-        invoiceId: 'INV-2024-007',
-        amount: 4200.50,
-        transaction_date: '2024-01-21T10:00:00Z',
-        status: 'completed',
-        createdAt: '2024-01-21T10:00:00Z',
-        updatedAt: '2024-01-21T10:05:00Z',
-    },
-    {
-        _id: '8',
-        payer_bank_account_id: 'BA-2024-015',
-        payee_bank_account_id: 'BA-2024-016',
-        payer_name: 'Lisa Anderson',
-        payer_email: 'lisa.anderson@example.com',
-        payee_name: 'Design Studio',
-        payee_email: 'accounts@designstudio.com',
-        invoiceId: 'INV-2024-008',
-        amount: 950.00,
-        transaction_date: '2024-01-22T15:30:00Z',
-        status: 'processing',
-        createdAt: '2024-01-22T15:30:00Z',
-        updatedAt: '2024-01-22T15:30:00Z',
-    },
-    {
-        _id: '9',
-        payer_bank_account_id: 'BA-2024-017',
-        payee_bank_account_id: 'BA-2024-018',
-        payer_name: 'James Taylor',
-        payer_email: 'james.taylor@example.com',
-        payee_name: 'Business Advisors',
-        payee_email: 'billing@businessadvisors.com',
-        invoiceId: 'INV-2024-009',
-        amount: 3100.25,
-        transaction_date: '2024-01-23T09:45:00Z',
-        status: 'completed',
-        createdAt: '2024-01-23T09:45:00Z',
-        updatedAt: '2024-01-23T09:50:00Z',
-    },
-    {
-        _id: '10',
-        payer_bank_account_id: 'BA-2024-019',
-        payee_bank_account_id: 'BA-2024-020',
-        payer_name: 'Patricia Thomas',
-        payer_email: 'patricia.thomas@example.com',
-        payee_name: 'Legal Services',
-        payee_email: 'payments@legalservices.com',
-        invoiceId: 'INV-2024-010',
-        amount: 6500.00,
-        transaction_date: '2024-01-24T14:15:00Z',
-        status: 'pending',
-        createdAt: '2024-01-24T14:15:00Z',
-        updatedAt: '2024-01-24T14:15:00Z',
-    },
-];
+interface Transaction extends ITransaction {}
 
 const Transaction = () => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -187,10 +21,11 @@ const Transaction = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
-    const [totalPages] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [error, setError] = useState<string | null>(null);
     const itemsPerPage = 10;
 
-    // Fetch transactions (using mock data)
+    // Fetch transactions from server
     useEffect(() => {
         fetchTransactions();
     }, [page]);
@@ -198,17 +33,21 @@ const Transaction = () => {
     const fetchTransactions = async () => {
         try {
             setLoading(true);
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 500));
+            setError(null);
             
-            // Paginate mock data
-            const startIndex = (page - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const paginatedData = mockTransactions.slice(startIndex, endIndex);
+            // Fetch real data from server
+            const response = await getUserTransactions({
+                page,
+                limit: itemsPerPage,
+            });
             
-            setTransactions(paginatedData);
+            if (response.success && response.data) {
+                setTransactions(response.data.transactions);
+                setTotalPages(response.data.pagination.totalPages);
+            }
         } catch (error) {
             console.error('Error fetching transactions:', error);
+            setError('Failed to load transactions. Please try again later.');
         } finally {
             setLoading(false);
         }
@@ -295,6 +134,19 @@ const Transaction = () => {
                 <Card>
                     <CardContent className="py-12 text-center">
                         <p className="text-muted-foreground">Loading transactions...</p>
+                    </CardContent>
+                </Card>
+            ) : error ? (
+                <Card>
+                    <CardContent className="py-12 text-center">
+                        <div className="text-destructive mb-4">
+                            <ArrowUpDown className="h-12 w-12 mx-auto mb-2" />
+                        </div>
+                        <h3 className="text-lg font-semibold mb-2">Error Loading Transactions</h3>
+                        <p className="text-muted-foreground mb-4">{error}</p>
+                        <Button onClick={fetchTransactions} variant="outline">
+                            Try Again
+                        </Button>
                     </CardContent>
                 </Card>
             ) : transactions.length === 0 ? (

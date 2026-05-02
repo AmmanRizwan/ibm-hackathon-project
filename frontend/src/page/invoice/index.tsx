@@ -10,7 +10,7 @@ import {
     DialogTitle,
     DialogDescription,
 } from '@/components/ui/dialog';
-import { getPaginatedInvoices, getInvoiceById as getMockInvoiceById } from '@/data/mockInvoices';
+import { getUserInvoices, getInvoiceById } from '@/service/invoice';
 
 interface Invoice {
     id: string;
@@ -43,8 +43,7 @@ const Invoice = () => {
     const fetchInvoices = async () => {
         try {
             setLoading(true);
-            // Using mock data instead of API call
-            const response = getPaginatedInvoices(page, 10);
+            const response = await getUserInvoices({ page, limit: 10 });
             setInvoices(response.data || []);
             setTotalPages(response.pagination?.totalPages || 1);
         } catch (error) {
@@ -57,10 +56,9 @@ const Invoice = () => {
     // View invoice details
     const handleViewInvoice = async (invoiceId: string) => {
         try {
-            // Using mock data instead of API call
-            const invoice = getMockInvoiceById(invoiceId);
-            if (invoice) {
-                setSelectedInvoice(invoice);
+            const response = await getInvoiceById(invoiceId);
+            if (response.data) {
+                setSelectedInvoice(response.data);
                 setIsDialogOpen(true);
             }
         } catch (error) {

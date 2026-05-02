@@ -17,14 +17,11 @@ import AdminPaymentMethod from "./admin/payment_method";
 import AdminTransaction from "./admin/transcation";
 import NavBar from "@/components/custom/navbar";
 import Sidebar from "@/components/custom/sidebar";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/store";
 import CreateBillingDetail from "./billing_detail/new";
 import CreatePaymentMethod from "./payment_method/new";
 
 const LayoutContent = () => {
     const location = useLocation();
-    const { token } = useSelector((state: RootState) => state.auth);
     
     // Routes where sidebar and navbar should not be displayed (auth pages)
     const authRoutes = ['/auth/login', '/auth/signup', '/auth/forgot-password'];

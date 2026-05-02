@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-// import { getAllVerifiedEmployees } from '@/service/user';
+import { getAllVerifiedEmployees } from '@/service/user';
+import { createTransaction } from '@/service/transaction';
+import { adminCreateInvoice } from '@/service/invoice';
 import type { IVerifiedEmployee } from '@/service/user/interface';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,165 +23,6 @@ import { Loader2, DollarSign, CheckCircle2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-// Mock data for verified employees
-const mockEmployees: IVerifiedEmployee[] = [
-    {
-        id: '1',
-        name: 'Rajesh Kumar',
-        email: 'rajesh.kumar@company.com',
-        phone: '+91-9876543210',
-        role: 'employee',
-        isVerify: true,
-        createdAt: '2024-01-15T10:30:00Z',
-        updatedAt: '2024-01-20T14:45:00Z',
-        billingDetails: [
-            {
-                id: 'bd1',
-                address: '123 MG Road',
-                pin: '560001',
-                city: 'Bangalore',
-                state: 'Karnataka',
-                isVerify: true,
-            },
-        ],
-        paymentMethods: [
-            {
-                id: 'pm1',
-                bank_name: 'State Bank of India',
-                account_holder_name: 'Rajesh Kumar',
-                account_number: '1234567890',
-                ifsc: 'SBIN0001234',
-                account_type: 'Savings',
-                isVerify: true,
-            },
-        ],
-    },
-    {
-        id: '2',
-        name: 'Priya Sharma',
-        email: 'priya.sharma@company.com',
-        phone: '+91-9876543211',
-        role: 'employee',
-        isVerify: true,
-        createdAt: '2024-02-10T09:15:00Z',
-        updatedAt: '2024-02-15T11:30:00Z',
-        billingDetails: [
-            {
-                id: 'bd2',
-                address: '456 Park Street',
-                pin: '700016',
-                city: 'Kolkata',
-                state: 'West Bengal',
-                isVerify: true,
-            },
-        ],
-        paymentMethods: [
-            {
-                id: 'pm2',
-                bank_name: 'HDFC Bank',
-                account_holder_name: 'Priya Sharma',
-                account_number: '9876543210',
-                ifsc: 'HDFC0001234',
-                account_type: 'Savings',
-                isVerify: true,
-            },
-        ],
-    },
-    {
-        id: '3',
-        name: 'Amit Patel',
-        email: 'amit.patel@company.com',
-        phone: '+91-9876543212',
-        role: 'employee',
-        isVerify: true,
-        createdAt: '2024-03-05T08:00:00Z',
-        updatedAt: '2024-03-10T16:20:00Z',
-        billingDetails: [
-            {
-                id: 'bd3',
-                address: '789 CG Road',
-                pin: '380009',
-                city: 'Ahmedabad',
-                state: 'Gujarat',
-                isVerify: true,
-            },
-        ],
-        paymentMethods: [
-            {
-                id: 'pm3',
-                bank_name: 'ICICI Bank',
-                account_holder_name: 'Amit Patel',
-                account_number: '5555666677',
-                ifsc: 'ICIC0001234',
-                account_type: 'Current',
-                isVerify: true,
-            },
-        ],
-    },
-    {
-        id: '4',
-        name: 'Sneha Reddy',
-        email: 'sneha.reddy@company.com',
-        phone: '+91-9876543213',
-        role: 'employee',
-        isVerify: true,
-        createdAt: '2024-04-01T07:30:00Z',
-        updatedAt: '2024-04-05T13:45:00Z',
-        billingDetails: [
-            {
-                id: 'bd4',
-                address: '321 Banjara Hills',
-                pin: '500034',
-                city: 'Hyderabad',
-                state: 'Telangana',
-                isVerify: true,
-            },
-        ],
-        paymentMethods: [
-            {
-                id: 'pm4',
-                bank_name: 'Axis Bank',
-                account_holder_name: 'Sneha Reddy',
-                account_number: '1111222233',
-                ifsc: 'UTIB0001234',
-                account_type: 'Savings',
-                isVerify: true,
-            },
-        ],
-    },
-    {
-        id: '5',
-        name: 'Vikram Singh',
-        email: 'vikram.singh@company.com',
-        phone: '+91-9876543214',
-        role: 'employee',
-        isVerify: true,
-        createdAt: '2024-05-01T10:00:00Z',
-        updatedAt: '2024-05-02T12:00:00Z',
-        billingDetails: [
-            {
-                id: 'bd5',
-                address: '654 Connaught Place',
-                pin: '110001',
-                city: 'New Delhi',
-                state: 'Delhi',
-                isVerify: true,
-            },
-        ],
-        paymentMethods: [
-            {
-                id: 'pm5',
-                bank_name: 'Punjab National Bank',
-                account_holder_name: 'Vikram Singh',
-                account_number: '9999888877',
-                ifsc: 'PUNB0001234',
-                account_type: 'Savings',
-                isVerify: true,
-            },
-        ],
-    },
-];
-
 const AdminPaymentMethod = () => {
     const [employees, setEmployees] = useState<IVerifiedEmployee[]>([]);
     const [loading, setLoading] = useState(true);
@@ -199,13 +42,26 @@ const AdminPaymentMethod = () => {
             setLoading(true);
             setError(null);
             
-            // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 800));
+            // Fetch verified employees from API
+            const response = await getAllVerifiedEmployees();
             
-            // Use mock data instead of API call
-            setEmployees(mockEmployees);
+            // Filter employees who have both verified billing details and payment methods
+            const fullyVerifiedEmployees = response.data.filter((employee: IVerifiedEmployee) => {
+                const hasBillingDetails = employee.billingDetails &&
+                    employee.billingDetails.length > 0 &&
+                    employee.billingDetails.some(bd => bd.isVerify);
+                
+                const hasPaymentMethods = employee.paymentMethods &&
+                    employee.paymentMethods.length > 0 &&
+                    employee.paymentMethods.some(pm => pm.isVerify);
+                
+                return employee.isVerify && hasBillingDetails && hasPaymentMethods;
+            });
+            
+            setEmployees(fullyVerifiedEmployees);
         } catch (err: any) {
             setError(err.response?.data?.message || 'Failed to fetch verified employees');
+            console.error('Error fetching verified employees:', err);
         } finally {
             setLoading(false);
         }
@@ -222,19 +78,102 @@ const AdminPaymentMethod = () => {
         setError(null);
 
         try {
-            // Simulate payment processing
-            // In a real application, this would call a backend API to process payments
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            const amount = parseFloat(fixedAmount);
+            let successCount = 0;
+            let failedCount = 0;
+            const failedEmployees: string[] = [];
 
-            setSuccessMessage(
-                `Successfully processed payments of ₹${fixedAmount} to ${employees.length} employee(s)`
-            );
+            // Process payment for each employee
+            for (const employee of employees) {
+                try {
+                    const paymentMethod = getPaymentMethod(employee.paymentMethods);
+                    
+                    if (!paymentMethod) {
+                        console.error(`No payment method found for ${employee.name}`);
+                        failedCount++;
+                        failedEmployees.push(`${employee.name} (No payment method)`);
+                        continue;
+                    }
+
+                    if (!paymentMethod.id) {
+                        console.error(`Invalid payment method ID for ${employee.name}`);
+                        failedCount++;
+                        failedEmployees.push(`${employee.name} (Invalid payment method)`);
+                        continue;
+                    }
+
+                    // Generate unique invoice number
+                    const invoiceNumber = `INV-${Date.now()}-${employee.id.substring(0, 8)}`;
+                    
+                    // Step 1: Create invoice for the employee using admin endpoint
+                    const invoiceResponse = await adminCreateInvoice({
+                        invoice_number: invoiceNumber,
+                        invoice_date: new Date().toISOString(),
+                        customer_name: employee.name,
+                        customer_email: employee.email,
+                        customer_phone: employee.phone,
+                        total_amount: amount,
+                        payment_status: 'paid',
+                        notes: `Bulk payment processed on ${new Date().toLocaleDateString()}`,
+                        status: 'paid',
+                        userId: employee.id
+                    });
+
+                    // Validate invoice response
+                    if (!invoiceResponse?.data?.id && !invoiceResponse?.data?._id) {
+                        console.error(`Failed to create invoice for ${employee.name}: Invalid response`);
+                        failedCount++;
+                        failedEmployees.push(`${employee.name} (Invoice creation failed)`);
+                        continue;
+                    }
+
+                    const invoiceId = invoiceResponse.data.id || invoiceResponse.data._id;
+
+                    // Step 2: Create transaction for each employee using the invoice ID
+                    await createTransaction({
+                        payee_bank_account_id: paymentMethod.id,
+                        payer_name: 'Admin',
+                        payer_email: 'admin@company.com',
+                        payee_name: employee.name,
+                        payee_email: employee.email,
+                        invoiceId: invoiceId,
+                        amount: amount,
+                        transaction_date: new Date().toISOString(),
+                        status: 'completed'
+                    });
+
+                    successCount++;
+                } catch (err: any) {
+                    const errorMessage = err.response?.data?.message || err.message || 'Unknown error';
+                    console.error(`Failed to process payment for ${employee.name}:`, errorMessage, err);
+                    failedCount++;
+                    failedEmployees.push(`${employee.name} (${errorMessage})`);
+                }
+            }
+
+            // Show success/failure message
+            if (successCount > 0 && failedCount === 0) {
+                setSuccessMessage(
+                    `Successfully processed payments of ₹${fixedAmount} to ${successCount} employee(s). Invoices and transactions created.`
+                );
+            } else if (successCount > 0 && failedCount > 0) {
+                setSuccessMessage(
+                    `Processed ${successCount} payment(s) successfully. ${failedCount} failed: ${failedEmployees.join(', ')}`
+                );
+            } else {
+                setError('Failed to process any payments. Please try again.');
+            }
+
             setPaymentDialogOpen(false);
 
-            // Clear success message after 5 seconds
-            setTimeout(() => setSuccessMessage(null), 5000);
+            // Refresh employee list
+            await fetchVerifiedEmployees();
+
+            // Clear success message after 8 seconds
+            setTimeout(() => setSuccessMessage(null), 8000);
         } catch (err: any) {
             setError(err.response?.data?.message || 'Failed to process payments');
+            console.error('Error processing bulk payments:', err);
         } finally {
             setProcessing(false);
         }

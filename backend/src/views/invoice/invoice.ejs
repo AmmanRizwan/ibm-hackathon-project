@@ -218,54 +218,6 @@
             </div>
         </div>
 
-        <!-- Invoice Items Table -->
-        <table class="invoice-table">
-            <thead>
-                <tr>
-                    <th>Description</th>
-                    <th class="text-right">Quantity</th>
-                    <th class="text-right">Rate</th>
-                    <th class="text-right">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% if (items && items.length > 0) { %>
-                    <% items.forEach(function(item) { %>
-                        <tr>
-                            <td>
-                                <strong><%= item.description %></strong>
-                                <% if (item.details) { %>
-                                    <br><small style="color: #666;"><%= item.details %></small>
-                                <% } %>
-                            </td>
-                            <td class="text-right"><%= item.quantity %></td>
-                            <td class="text-right">$<%= item.rate.toFixed(2) %></td>
-                            <td class="text-right">$<%= (item.quantity * item.rate).toFixed(2) %></td>
-                        </tr>
-                    <% }); %>
-                <% } else { %>
-                    <tr>
-                        <td>Payroll Services - Monthly</td>
-                        <td class="text-right">1</td>
-                        <td class="text-right">$500.00</td>
-                        <td class="text-right">$500.00</td>
-                    </tr>
-                    <tr>
-                        <td>Employee Benefits Management</td>
-                        <td class="text-right">1</td>
-                        <td class="text-right">$200.00</td>
-                        <td class="text-right">$200.00</td>
-                    </tr>
-                    <tr>
-                        <td>Tax Filing Services</td>
-                        <td class="text-right">1</td>
-                        <td class="text-right">$150.00</td>
-                        <td class="text-right">$150.00</td>
-                    </tr>
-                <% } %>
-            </tbody>
-        </table>
-
         <!-- Totals Section -->
         <div class="totals-section">
             <div class="totals">
@@ -290,17 +242,6 @@
                     <span>$<%= total || '850.00' %></span>
                 </div>
             </div>
-        </div>
-
-        <!-- Notes Section -->
-        <div class="notes-section">
-            <h3>Payment Information:</h3>
-            <p><strong>Payment Method:</strong> <%= paymentMethod || 'Bank Transfer / Credit Card' %></p>
-            <% if (bankDetails) { %>
-                <p><strong>Bank Name:</strong> <%= bankDetails.name %></p>
-                <p><strong>Account Number:</strong> <%= bankDetails.account %></p>
-                <p><strong>Routing Number:</strong> <%= bankDetails.routing %></p>
-            <% } %>
         </div>
 
         <% if (notes) { %>
