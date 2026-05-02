@@ -13,18 +13,21 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         const { email, password } = req.body;
 
         if (!email || !password) {
+            await transaction.rollback();
             return throwCustomError(400, "Email and password are required!");
         }
 
         const user = await User.findOne({ where: { email: email.toLowerCase() }, transaction});
 
         if (!user) {
+            await transaction.rollback();
             return throwCustomError(400, "Invalid email or password");
         }
 
         const isPasswordValid = comparePassword(password, user.dataValues.password);
 
         if (!isPasswordValid) {
+            await transaction.rollback();
             return throwCustomError(400, "Invalid email or password");
         }
 
@@ -48,13 +51,18 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             context: {
                 name: user.dataValues.name,
                 otp,
+                email: user.dataValues.email
             }
         })
 
         res.status(200).json({ message: "Please check your email for verification" });
     }
     catch (err) {
-        await transaction.rollback();
+        try {
+            await transaction.rollback();
+        } catch (rollbackError) {
+            // Transaction was already committed or rolled back
+        }
         next(err);
     }
 }
@@ -65,10 +73,12 @@ export const loginVerify = async (req: Request, res: Response, next: NextFunctio
         const { email, otp } = req.body;
 
         if (!otp) {
+            await transaction.rollback();
             return throwCustomError(400, "OTP is required!");
         }
 
         if (!email) {
+            await transaction.rollback();
             return throwCustomError(400, "Email is required!");
         }
 
@@ -82,19 +92,22 @@ export const loginVerify = async (req: Request, res: Response, next: NextFunctio
         const otpRecord = await Otp.findOne({ where: query, transaction });
 
         if (!otpRecord) {
+            await transaction.rollback();
             return throwCustomError(400, "Invalid OTP");
         }
 
         if (otpRecord.dataValues.expireAt < new Date()) {
+            await transaction.rollback();
             return throwCustomError(400, "OTP expired!");
         }
 
-        const userRecord = await User.findOne({ 
+        const userRecord = await User.findOne({
             where: { email: otpRecord.dataValues.email },
             transaction
         });
 
         if (!userRecord) {
+            await transaction.rollback();
             return throwCustomError(400, "Email record not found!");
         }
 
@@ -112,7 +125,11 @@ export const loginVerify = async (req: Request, res: Response, next: NextFunctio
         })
     }
     catch (err) {
-        await transaction.rollback();
+        try {
+            await transaction.rollback();
+        } catch (rollbackError) {
+            // Transaction was already committed or rolled back
+        }
         next(err);
     }
 }
@@ -123,6 +140,7 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
         const { name, email, password, phone } = req.body;
 
         if (!name || !email || !password || !phone) {
+            await transaction.rollback();
             return throwCustomError(400, "All fields are required!");
         }
 
@@ -132,6 +150,7 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
         });
 
         if (existingUser) {
+            await transaction.rollback();
             return throwCustomError(400, "User with this email already exists!");
         }
 
@@ -163,13 +182,18 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
             context: {
                 name,
                 otp,
+                email
             }
         });
 
         res.status(201).json({ message: "Please check your email for verification" });
     }
     catch (err) {
-        await transaction.rollback();
+        try {
+            await transaction.rollback();
+        } catch (rollbackError) {
+            // Transaction was already committed or rolled back
+        }
         next(err);
     }
 }
@@ -180,10 +204,12 @@ export const signUpVerify = async (req: Request, res: Response, next: NextFuncti
         const { email, otp } = req.body;
 
         if (!otp) {
+            await transaction.rollback();
             return throwCustomError(400, "OTP is required!");
         }
 
         if (!email) {
+            await transaction.rollback();
             return throwCustomError(400, "Email is required!");
         }
 
@@ -195,10 +221,12 @@ export const signUpVerify = async (req: Request, res: Response, next: NextFuncti
         const otpRecord = await Otp.findOne({ where: query, transaction });
 
         if (!otpRecord) {
+            await transaction.rollback();
             return throwCustomError(400, "Invalid OTP");
         }
 
         if (otpRecord.dataValues.expireAt < new Date()) {
+            await transaction.rollback();
             return throwCustomError(400, "OTP expired!");
         }
 
@@ -208,6 +236,7 @@ export const signUpVerify = async (req: Request, res: Response, next: NextFuncti
         });
 
         if (!userRecord) {
+            await transaction.rollback();
             return throwCustomError(400, "User not found!");
         }
 
@@ -227,7 +256,11 @@ export const signUpVerify = async (req: Request, res: Response, next: NextFuncti
         });
     }
     catch (err) {
-        await transaction.rollback();
+        try {
+            await transaction.rollback();
+        } catch (rollbackError) {
+            // Transaction was already committed or rolled back
+        }
         next(err);
     }
 }
@@ -238,6 +271,7 @@ export const signUpResendOtp = async (req: Request, res: Response, next: NextFun
         const { email } = req.body;
 
         if (!email) {
+            await transaction.rollback();
             return throwCustomError(400, "Email is required!");
         }
 
@@ -247,10 +281,12 @@ export const signUpResendOtp = async (req: Request, res: Response, next: NextFun
         });
 
         if (!user) {
+            await transaction.rollback();
             return throwCustomError(400, "User not found!");
         }
 
         if (user.dataValues.isVerify) {
+            await transaction.rollback();
             return throwCustomError(400, "User is already verified!");
         }
 
@@ -284,7 +320,11 @@ export const signUpResendOtp = async (req: Request, res: Response, next: NextFun
         res.status(200).json({ message: "OTP resent successfully. Please check your email." });
     }
     catch (err) {
-        await transaction.rollback();
+        try {
+            await transaction.rollback();
+        } catch (rollbackError) {
+            // Transaction was already committed or rolled back
+        }
         next(err);
     }
 }
@@ -295,6 +335,7 @@ export const forgetEmail = async (req: Request, res: Response, next: NextFunctio
         const { email } = req.body;
 
         if (!email) {
+            await transaction.rollback();
             return throwCustomError(400, "Email is required!");
         }
 
@@ -304,10 +345,12 @@ export const forgetEmail = async (req: Request, res: Response, next: NextFunctio
         });
 
         if (!user) {
+            await transaction.rollback();
             return throwCustomError(400, "User not found!");
         }
 
         if (!user.dataValues.isVerify) {
+            await transaction.rollback();
             return throwCustomError(400, "Email is not verify!");
         }
 
@@ -341,7 +384,11 @@ export const forgetEmail = async (req: Request, res: Response, next: NextFunctio
         res.status(200).json({ message: "Please check your email for password reset instructions" });
     }
     catch (err) {
-        await transaction.rollback();
+        try {
+            await transaction.rollback();
+        } catch (rollbackError) {
+            // Transaction was already committed or rolled back
+        }
         next(err);
     }
 }
@@ -352,10 +399,12 @@ export const forgetVerifyOtp = async (req: Request, res: Response, next: NextFun
         const { email, otp } = req.body;
 
         if (!otp) {
+            await transaction.rollback();
             return throwCustomError(400, "OTP is required!");
         }
 
         if (!email) {
+            await transaction.rollback();
             return throwCustomError(400, "Email is required!");
         }
 
@@ -367,10 +416,12 @@ export const forgetVerifyOtp = async (req: Request, res: Response, next: NextFun
         const otpRecord = await Otp.findOne({ where: query, transaction });
 
         if (!otpRecord) {
+            await transaction.rollback();
             return throwCustomError(400, "Invalid OTP");
         }
 
         if (otpRecord.dataValues.expireAt < new Date()) {
+            await transaction.rollback();
             return throwCustomError(400, "OTP expired!");
         }
 
@@ -380,6 +431,7 @@ export const forgetVerifyOtp = async (req: Request, res: Response, next: NextFun
         });
 
         if (!userRecord) {
+            await transaction.rollback();
             return throwCustomError(400, "User not found!");
         }
 
@@ -393,7 +445,11 @@ export const forgetVerifyOtp = async (req: Request, res: Response, next: NextFun
         });
     }
     catch (err) {
-        await transaction.rollback();
+        try {
+            await transaction.rollback();
+        } catch (rollbackError) {
+            // Transaction was already committed or rolled back
+        }
         next(err);
     }
 }
@@ -404,14 +460,17 @@ export const forgetVerify = async (req: Request, res: Response, next: NextFuncti
         const { email, otp, newPassword } = req.body;
 
         if (!email) {
+            await transaction.rollback();
             return throwCustomError(400, "Email is required!");
         }
 
         if (!otp) {
+            await transaction.rollback();
             return throwCustomError(400, "OTP is required!");
         }
 
         if (!newPassword) {
+            await transaction.rollback();
             return throwCustomError(400, "New password is required!");
         }
 
@@ -423,10 +482,12 @@ export const forgetVerify = async (req: Request, res: Response, next: NextFuncti
         const otpRecord = await Otp.findOne({ where: query, transaction });
 
         if (!otpRecord) {
+            await transaction.rollback();
             return throwCustomError(400, "Invalid OTP");
         }
 
         if (otpRecord.dataValues.expireAt < new Date()) {
+            await transaction.rollback();
             return throwCustomError(400, "OTP expired!");
         }
 
@@ -436,6 +497,7 @@ export const forgetVerify = async (req: Request, res: Response, next: NextFuncti
         });
 
         if (!userRecord) {
+            await transaction.rollback();
             return throwCustomError(400, "User not found!");
         }
 
@@ -452,7 +514,11 @@ export const forgetVerify = async (req: Request, res: Response, next: NextFuncti
         });
     }
     catch (err) {
-        await transaction.rollback();
+        try {
+            await transaction.rollback();
+        } catch (rollbackError) {
+            // Transaction was already committed or rolled back
+        }
         next(err);
     }
 }
