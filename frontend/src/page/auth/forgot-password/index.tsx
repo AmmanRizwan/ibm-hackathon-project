@@ -32,6 +32,7 @@ import {
 import { Input } from "@/components/ui/input";
 import PageLoader from "@/components/custom/page-loader";
 import { forgetEmail, forgetVerifyOtp, forgetVerify } from "@/service/auth";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ForgotPasswordFormValues {
     email: string;
@@ -43,13 +44,14 @@ interface ForgotPasswordFormValues {
 // FIXME: Remove this after testing
 const defaultValues: Partial<ForgotPasswordFormValues> = {
   email: "",
-  password: "Password@123",
-  confirmPassword: "Password@123",
+  password: "",
+  confirmPassword: "",
   otp: undefined,
 };
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -68,8 +70,18 @@ export default function ForgotPasswordPage() {
     try {
       await forgetEmail({ email: data.email });
       setCurrentStep(1);
+      toast({
+        title: "OTP Sent",
+        description: "Please check your email for the verification code.",
+      });
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to send OTP. Please try again.");
+      const errorMessage = err.response?.data?.message || "Failed to send OTP. Please try again.";
+      setError(errorMessage);
+      toast({
+        title: "Failed to Send OTP",
+        description: errorMessage,
+        variant: "destructive",
+      });
       console.error("Email submission error:", err);
     } finally {
       setIsLoading(false);
@@ -85,8 +97,18 @@ export default function ForgotPasswordPage() {
         otp: data.otp
       });
       setCurrentStep(2);
+      toast({
+        title: "OTP Verified",
+        description: "Please enter your new password.",
+      });
     } catch (err: any) {
-      setError(err.response?.data?.message || "Invalid OTP. Please try again.");
+      const errorMessage = err.response?.data?.message || "Invalid OTP. Please try again.";
+      setError(errorMessage);
+      toast({
+        title: "Verification Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
       console.error("OTP verification error:", err);
     } finally {
       setIsLoading(false);
@@ -95,7 +117,13 @@ export default function ForgotPasswordPage() {
 
   const onResetPassword = async (data: ForgotPasswordFormValues) => {
     if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match!");
+      const errorMessage = "Passwords do not match!";
+      setError(errorMessage);
+      toast({
+        title: "Password Mismatch",
+        description: errorMessage,
+        variant: "destructive",
+      });
       return;
     }
 
@@ -109,9 +137,19 @@ export default function ForgotPasswordPage() {
       });
       setIsPasswordReset(true);
       setCurrentStep(3);
+      toast({
+        title: "Password Reset Successful",
+        description: "Your password has been reset successfully.",
+      });
     } catch (err: any) {
       setIsPasswordReset(false);
-      setError(err.response?.data?.message || "Failed to reset password. Please try again.");
+      const errorMessage = err.response?.data?.message || "Failed to reset password. Please try again.";
+      setError(errorMessage);
+      toast({
+        title: "Reset Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
       console.error("Password reset error:", err);
       setCurrentStep(3);
     } finally {
@@ -122,7 +160,13 @@ export default function ForgotPasswordPage() {
   const onRequestForgotPasswordOtp = async () => {
     const email = form.getValues("email");
     if (!email) {
-      setError("Email is required to resend OTP");
+      const errorMessage = "Email is required to resend OTP";
+      setError(errorMessage);
+      toast({
+        title: "Email Required",
+        description: errorMessage,
+        variant: "destructive",
+      });
       return;
     }
 
@@ -131,9 +175,18 @@ export default function ForgotPasswordPage() {
     try {
       await forgetEmail({ email });
       setError(null);
-      // Show success message (you could add a success state if needed)
+      toast({
+        title: "OTP Resent",
+        description: "A new verification code has been sent to your email.",
+      });
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to resend OTP. Please try again.");
+      const errorMessage = err.response?.data?.message || "Failed to resend OTP. Please try again.";
+      setError(errorMessage);
+      toast({
+        title: "Resend Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
       console.error("Resend OTP error:", err);
     } finally {
       setIsLoading(false);

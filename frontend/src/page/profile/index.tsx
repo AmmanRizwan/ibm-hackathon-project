@@ -21,11 +21,11 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Alert } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PageLoader from '@/components/custom/page-loader';
 import { getMe, updateUserDetail } from '@/service/user';
 import { setUser, removeUser, removeToken } from '@/store/auth';
+import { useToast } from '@/components/ui/use-toast';
 
 interface ProfileFormValues {
     name: string;
@@ -40,11 +40,10 @@ interface PasswordFormValues {
 const Profile = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { toast } = useToast();
     const user = useSelector((state: any) => state.auth.user);
     const [isLoading, setIsLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
     const [activeTab, setActiveTab] = useState('profile');
 
     // Profile form
@@ -80,7 +79,11 @@ const Profile = () => {
                 });
             }
         } catch (error: any) {
-            setErrorMessage(error.response?.data?.message || 'Failed to fetch user data');
+            toast({
+                title: "Error",
+                description: error.response?.data?.message || 'Failed to fetch user data',
+                variant: "destructive",
+            });
         } finally {
             setIsLoading(false);
         }
@@ -88,8 +91,6 @@ const Profile = () => {
 
     const onProfileSubmit = async (data: ProfileFormValues) => {
         setIsLoading(true);
-        setErrorMessage('');
-        setSuccessMessage('');
 
         try {
             const response = await updateUserDetail({
@@ -97,8 +98,10 @@ const Profile = () => {
                 phone: data.phone.trim(),
             });
 
-            setSuccessMessage(response.message || 'Profile updated successfully!');
-            setErrorMessage('');
+            toast({
+                title: "Success",
+                description: response.message || 'Profile updated successfully!',
+            });
             setIsEditMode(false);
 
             // Update Redux store
@@ -111,8 +114,11 @@ const Profile = () => {
             // Refresh user data
             await fetchUserData();
         } catch (error: any) {
-            setErrorMessage(error.response?.data?.message || 'Failed to update profile');
-            setSuccessMessage('');
+            toast({
+                title: "Error",
+                description: error.response?.data?.message || 'Failed to update profile',
+                variant: "destructive",
+            });
         } finally {
             setIsLoading(false);
         }
@@ -120,22 +126,25 @@ const Profile = () => {
 
     const onPasswordSubmit = async (data: PasswordFormValues) => {
         setIsLoading(true);
-        setErrorMessage('');
-        setSuccessMessage('');
 
         try {
             const response = await updateUserDetail({
                 password: data.password,
             });
 
-            setSuccessMessage(response.message || 'Password updated successfully!');
-            setErrorMessage('');
+            toast({
+                title: "Success",
+                description: response.message || 'Password updated successfully!',
+            });
 
             // Reset password form
             passwordForm.reset();
         } catch (error: any) {
-            setErrorMessage(error.response?.data?.message || 'Failed to update password');
-            setSuccessMessage('');
+            toast({
+                title: "Error",
+                description: error.response?.data?.message || 'Failed to update password',
+                variant: "destructive",
+            });
         } finally {
             setIsLoading(false);
         }
@@ -147,8 +156,6 @@ const Profile = () => {
             name: user?.name || '',
             phone: user?.phone || '',
         });
-        setErrorMessage('');
-        setSuccessMessage('');
     };
 
     const handleLogout = () => {
@@ -197,19 +204,6 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Success/Error Messages */}
-            {successMessage && (
-                <Alert className="mb-6 bg-green-50 border-green-200">
-                    <p className="text-green-800">{successMessage}</p>
-                </Alert>
-            )}
-
-            {errorMessage && (
-                <Alert className="mb-6 bg-red-50 border-red-200">
-                    <p className="text-red-800">{errorMessage}</p>
-                </Alert>
-            )}
 
             {/* Tabs for Profile and Password */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

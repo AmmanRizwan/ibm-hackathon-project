@@ -20,10 +20,12 @@ import {
 } from '@/components/ui/table';
 import { getUserTransactions } from '@/service/transaction';
 import type { ITransaction } from '@/service/transaction/interface';
+import { useToast } from '@/components/ui/use-toast';
 
 interface Transaction extends ITransaction {}
 
 const Transaction = () => {
+    const { toast } = useToast();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -53,9 +55,15 @@ const Transaction = () => {
                 setTransactions(response.data.transactions);
                 setTotalPages(response.data.pagination.totalPages);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error fetching transactions:', error);
-            setError('Failed to load transactions. Please try again later.');
+            const errorMessage = error?.response?.data?.message || 'Failed to load transactions. Please try again later.';
+            setError(errorMessage);
+            toast({
+                title: "Error",
+                description: errorMessage,
+                variant: "destructive",
+            });
         } finally {
             setLoading(false);
         }

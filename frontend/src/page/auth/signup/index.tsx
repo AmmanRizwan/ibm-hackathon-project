@@ -35,6 +35,7 @@ import { Input } from "@/components/ui/input";
 import PageLoader from "@/components/custom/page-loader";
 import { signUp, signUpVerify, signUpResendOtp } from "@/service/auth";
 import type { ISignUp, ISignUpVerify, ISignUpResendOtp } from "@/service/auth/interface";
+import { useToast } from "@/components/ui/use-toast";
 
 interface SignUpFormValues {
     name: string;
@@ -56,6 +57,7 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const form = useForm<SignUpFormValues>({
     defaultValues,
@@ -68,10 +70,19 @@ export default function SignUpPage() {
     mutationFn: (payload: ISignUp) => signUp(payload),
     onSuccess: () => {
       setCurrentStep(1);
+      toast({
+        title: "OTP Sent",
+        description: "Please check your email for the verification code.",
+      });
     },
     onError: (error: any) => {
       console.error("Signup error:", error);
-      // You can add toast notification here
+      const errorMessage = error?.response?.data?.message || "Signup failed. Please try again.";
+      toast({
+        title: "Signup Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     },
   });
 
@@ -83,11 +94,20 @@ export default function SignUpPage() {
       if (data.data.token) {
         localStorage.setItem("token", data.data.token);
       }
+      toast({
+        title: "Account Created Successfully",
+        description: "Welcome! Redirecting to your profile...",
+      });
       navigate("/user/profile");
     },
     onError: (error: any) => {
       console.error("OTP verification error:", error);
-      // You can add toast notification here
+      const errorMessage = error?.response?.data?.message || "OTP verification failed. Please try again.";
+      toast({
+        title: "Verification Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     },
   });
 
@@ -96,11 +116,19 @@ export default function SignUpPage() {
     mutationFn: (payload: ISignUpResendOtp) => signUpResendOtp(payload),
     onSuccess: () => {
       console.log("OTP resent successfully");
-      // You can add toast notification here
+      toast({
+        title: "OTP Resent",
+        description: "A new verification code has been sent to your email.",
+      });
     },
     onError: (error: any) => {
       console.error("Resend OTP error:", error);
-      // You can add toast notification here
+      const errorMessage = error?.response?.data?.message || "Failed to resend OTP. Please try again.";
+      toast({
+        title: "Resend Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     },
   });
 

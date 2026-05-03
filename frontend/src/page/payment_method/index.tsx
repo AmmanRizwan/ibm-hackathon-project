@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { getUserPaymentMethods } from '@/service/payment_methods';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
+import { useToast } from '@/components/ui/use-toast';
 
 interface PaymentMethodData {
     id: string;
@@ -22,6 +23,7 @@ interface PaymentMethodData {
 
 const PaymentMethod = () => {
     const navigate = useNavigate();
+    const { toast } = useToast();
     const { user } = useSelector((state: RootState) => state.auth);
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethodData[]>([]);
     const [loading, setLoading] = useState(true);
@@ -37,7 +39,11 @@ const PaymentMethod = () => {
             setPaymentMethods(response.data || []);
         } catch (error: any) {
             console.error('Error fetching payment methods:', error);
-            // Handle error appropriately - could show error state in UI
+            toast({
+                title: "Error",
+                description: error?.response?.data?.message || 'Failed to fetch payment methods',
+                variant: "destructive",
+            });
         } finally {
             setLoading(false);
         }

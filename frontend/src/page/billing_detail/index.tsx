@@ -6,9 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { getUserBillingDetails } from '@/service/billing_details';
 import PageLoader from '@/components/custom/page-loader';
-import { Alert } from '@/components/ui/alert';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
+import { useToast } from '@/components/ui/use-toast';
 
 interface BillingDetailType {
     id: string;
@@ -24,10 +24,10 @@ interface BillingDetailType {
 
 const BillingDetail = () => {
     const navigate = useNavigate();
+    const { toast } = useToast();
     const { user } = useSelector((state: RootState) => state.auth);
     const [billingDetails, setBillingDetails] = useState<BillingDetailType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         fetchBillingDetails();
@@ -35,12 +35,15 @@ const BillingDetail = () => {
 
     const fetchBillingDetails = async () => {
         setIsLoading(true);
-        setErrorMessage('');
         try {
             const response = await getUserBillingDetails();
             setBillingDetails(response.data || []);
         } catch (error: any) {
-            setErrorMessage(error.response?.data?.message || 'Failed to fetch billing details');
+            toast({
+                title: "Error",
+                description: error.response?.data?.message || 'Failed to fetch billing details',
+                variant: "destructive",
+            });
         } finally {
             setIsLoading(false);
         }
@@ -64,13 +67,6 @@ const BillingDetail = () => {
                     </Button>
                 )}
             </div>
-
-            {/* Error Message */}
-            {errorMessage && (
-                <Alert className="mb-6 bg-red-50 border-red-200">
-                    <p className="text-red-800">{errorMessage}</p>
-                </Alert>
-            )}
 
             <div className="grid gap-6">
                 {billingDetails.map((detail) => (
@@ -160,7 +156,7 @@ const BillingDetail = () => {
             </div>
 
             {/* Empty State (if no billing details) */}
-            {billingDetails.length === 0 && !isLoading && !errorMessage && (
+            {billingDetails.length === 0 && !isLoading && (
                 <Card>
                     <CardContent className="py-12 text-center">
                         <MapPin className="h-12 w-12 mx-auto text-muted-foreground mb-4" />

@@ -20,9 +20,9 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert } from '@/components/ui/alert';
 import PageLoader from '@/components/custom/page-loader';
 import { createUserPaymentMethod } from '@/service/payment_methods';
+import { useToast } from '@/components/ui/use-toast';
 
 interface PaymentMethodFormValues {
     bank_name: string;
@@ -34,9 +34,8 @@ interface PaymentMethodFormValues {
 
 const CreatePaymentMethod = () => {
     const navigate = useNavigate();
+    const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
 
     const form = useForm<PaymentMethodFormValues>({
         defaultValues: {
@@ -50,8 +49,6 @@ const CreatePaymentMethod = () => {
 
     const onSubmit = async (data: PaymentMethodFormValues) => {
         setIsLoading(true);
-        setErrorMessage('');
-        setSuccessMessage('');
 
         try {
             const response = await createUserPaymentMethod({
@@ -62,8 +59,10 @@ const CreatePaymentMethod = () => {
                 account_number: data.account_number.trim(),
             });
 
-            setSuccessMessage(response.message || 'Payment method created successfully!');
-            setErrorMessage('');
+            toast({
+                title: "Success",
+                description: response.message || "Payment created Successfully"
+            })
 
             // Reset form
             form.reset();
@@ -73,8 +72,10 @@ const CreatePaymentMethod = () => {
                 navigate('/user/payment-method');
             }, 1500);
         } catch (error: any) {
-            setErrorMessage(error.response?.data?.message || 'Failed to create payment method');
-            setSuccessMessage('');
+            toast({
+                title: "Error",
+                description: error.response?.data?.message || "Failed to created payment detail"
+            })
         } finally {
             setIsLoading(false);
         }
@@ -95,20 +96,6 @@ const CreatePaymentMethod = () => {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {/* Success Message */}
-                    {successMessage && (
-                        <Alert className="mb-6 bg-green-50 border-green-200">
-                            <p className="text-green-800">{successMessage}</p>
-                        </Alert>
-                    )}
-
-                    {/* Error Message */}
-                    {errorMessage && (
-                        <Alert className="mb-6 bg-red-50 border-red-200">
-                            <p className="text-red-800">{errorMessage}</p>
-                        </Alert>
-                    )}
-
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                             {/* Bank Name Field */}

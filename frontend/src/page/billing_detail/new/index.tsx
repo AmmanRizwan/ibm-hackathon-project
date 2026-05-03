@@ -13,9 +13,9 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert } from '@/components/ui/alert';
 import PageLoader from '@/components/custom/page-loader';
 import { createUserBillingDetail } from '@/service/billing_details';
+import { useToast } from '@/components/ui/use-toast';
 
 interface BillingDetailFormValues {
     address: string;
@@ -26,9 +26,8 @@ interface BillingDetailFormValues {
 
 const CreateBillingDetail = () => {
     const navigate = useNavigate();
+    const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
 
     const form = useForm<BillingDetailFormValues>({
         defaultValues: {
@@ -41,8 +40,6 @@ const CreateBillingDetail = () => {
 
     const onSubmit = async (data: BillingDetailFormValues) => {
         setIsLoading(true);
-        setErrorMessage('');
-        setSuccessMessage('');
 
         try {
             const response = await createUserBillingDetail({
@@ -52,8 +49,10 @@ const CreateBillingDetail = () => {
                 state: data.state.trim(),
             });
 
-            setSuccessMessage(response.message || 'Billing detail created successfully!');
-            setErrorMessage('');
+            toast({
+                title: "Success",
+                description: response.message || 'Billing detail created successfully!',
+            });
 
             // Reset form
             form.reset();
@@ -63,8 +62,11 @@ const CreateBillingDetail = () => {
                 navigate('/user/billing_detail');
             }, 1500);
         } catch (error: any) {
-            setErrorMessage(error.response?.data?.message || 'Failed to create billing detail');
-            setSuccessMessage('');
+            toast({
+                title: "Error",
+                description: error.response?.data?.message || 'Failed to create billing detail',
+                variant: "destructive",
+            });
         } finally {
             setIsLoading(false);
         }
@@ -85,20 +87,6 @@ const CreateBillingDetail = () => {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {/* Success Message */}
-                    {successMessage && (
-                        <Alert className="mb-6 bg-green-50 border-green-200">
-                            <p className="text-green-800">{successMessage}</p>
-                        </Alert>
-                    )}
-
-                    {/* Error Message */}
-                    {errorMessage && (
-                        <Alert className="mb-6 bg-red-50 border-red-200">
-                            <p className="text-red-800">{errorMessage}</p>
-                        </Alert>
-                    )}
-
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                             {/* Address Field */}

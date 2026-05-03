@@ -19,6 +19,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { getUserInvoices, getInvoiceById } from '@/service/invoice';
+import { useToast } from '@/components/ui/use-toast';
 
 interface Invoice {
     id: string;
@@ -36,6 +37,7 @@ interface Invoice {
 }
 
 const Invoice = () => {
+    const { toast } = useToast();
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -54,8 +56,13 @@ const Invoice = () => {
             const response = await getUserInvoices({ page, limit: 10 });
             setInvoices(response.data || []);
             setTotalPages(response.pagination?.totalPages || 1);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error fetching invoices:', error);
+            toast({
+                title: "Error",
+                description: error?.response?.data?.message || 'Failed to fetch invoices',
+                variant: "destructive",
+            });
         } finally {
             setLoading(false);
         }
@@ -69,8 +76,13 @@ const Invoice = () => {
                 setSelectedInvoice(response.data);
                 setIsDialogOpen(true);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error fetching invoice details:', error);
+            toast({
+                title: "Error",
+                description: error?.response?.data?.message || 'Failed to fetch invoice details',
+                variant: "destructive",
+            });
         }
     };
 

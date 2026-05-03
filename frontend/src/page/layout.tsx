@@ -19,6 +19,7 @@ import NavBar from "@/components/custom/navbar";
 import Sidebar from "@/components/custom/sidebar";
 import CreateBillingDetail from "./billing_detail/new";
 import CreatePaymentMethod from "./payment_method/new";
+import { Toaster } from "@/components/ui/toaster";
 
 const LayoutContent = () => {
     const location = useLocation();
@@ -66,6 +67,7 @@ const LayoutContent = () => {
                     </Routes>
                 </div>
             </main>
+            <Toaster />
         </>
     );
 };

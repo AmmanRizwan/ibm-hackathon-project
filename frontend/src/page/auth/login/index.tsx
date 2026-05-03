@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input";
 import PageLoader from "@/components/custom/page-loader";
 import { login, loginVerify } from "@/service/auth";
 import type { ILogin, ILoginVerify } from "@/service/auth/interface";
+import { useToast } from "@/components/ui/use-toast";
 
 interface LoginFormValues {
   email: string;
@@ -50,6 +51,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const form = useForm<LoginFormValues>({
     defaultValues,
@@ -63,11 +65,19 @@ export default function Login() {
     mutationFn: (payload: ILogin) => login(payload),
     onSuccess: () => {
       setCurrentStep(1);
+      toast({
+        title: "OTP Sent",
+        description: "Please check your email for the verification code.",
+      });
     },
     onError: (error: any) => {
       console.error("Login error:", error);
       const errorMessage = error?.response?.data?.message || "Login failed. Please try again.";
-      alert(errorMessage);
+      toast({
+        title: "Login Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     },
   });
 
@@ -80,12 +90,20 @@ export default function Login() {
       if (data.data.token) {
         localStorage.setItem("token", data.data.token);
       }
+      toast({
+        title: "Login Successful",
+        description: "Welcome back! Redirecting to your profile...",
+      });
       navigate("/user/profile");
     },
     onError: (error: any) => {
       console.error("OTP verification error:", error);
       const errorMessage = error?.response?.data?.message || "OTP verification failed. Please try again.";
-      alert(errorMessage);
+      toast({
+        title: "Verification Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     },
   });
 
