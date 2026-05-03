@@ -39,7 +39,7 @@ const AdminPaymentMethod = () => {
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    const [fixedAmount, setFixedAmount] = useState<string>('5000');
+    const [fixedAmount, setFixedAmount] = useState<string>('50');
 
     // Fetch verified employees on component mount
     useEffect(() => {
@@ -240,7 +240,7 @@ const AdminPaymentMethod = () => {
                             onClick={openPaymentDialog}
                             disabled={loading || employees.length === 0}
                             size="lg"
-                            className='bg-green-300 hover:bg-green-400'
+                            className='bg-green-300 hover:bg-green-400 hover:cursor-pointer'
                         >
                             <DollarSign className="h-5 w-5 mr-1" />
                             Pay All Employees
@@ -304,7 +304,7 @@ const AdminPaymentMethod = () => {
                                                 {formatAddress(employee.billingDetails)}
                                             </TableCell>
                                             <TableCell className="text-right font-semibold">
-                                                ₹{fixedAmount}
+                                                ${fixedAmount}
                                             </TableCell>
                                         </TableRow>
                                     );
@@ -316,7 +316,7 @@ const AdminPaymentMethod = () => {
                                         Total Amount:
                                     </TableCell>
                                     <TableCell className="text-right font-bold text-lg">
-                                        ₹{(parseFloat(fixedAmount) * employees.length).toLocaleString()}
+                                        ${(parseFloat(fixedAmount) * employees.length).toLocaleString()}
                                     </TableCell>
                                 </TableRow>
                             </TableFooter>
@@ -336,7 +336,7 @@ const AdminPaymentMethod = () => {
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="amount">Fixed Amount per Employee (₹)</Label>
+                            <Label htmlFor="amount">Fixed Amount per Employee ($)</Label>
                             <Input
                                 id="amount"
                                 type="number"
@@ -359,7 +359,7 @@ const AdminPaymentMethod = () => {
                             <div className="flex justify-between border-t pt-2">
                                 <span className="font-semibold">Total Amount:</span>
                                 <span className="font-bold text-lg">
-                                    ₹{(parseFloat(fixedAmount || '0') * employees.length).toLocaleString()}
+                                    ${(parseFloat(fixedAmount || '0') * employees.length).toLocaleString()}
                                 </span>
                             </div>
                         </div>

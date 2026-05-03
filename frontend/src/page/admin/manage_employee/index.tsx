@@ -314,6 +314,7 @@ const AdminBillingDetail = () => {
                                                 </Button>
                                                 <Button
                                                     variant="destructive"
+                                                    className='bg-red-400 text-white hover:bg-red-500 hover:cursor-pointer'
                                                     size="sm"
                                                     onClick={() => openDeleteDialog(employee)}
                                                 >
@@ -440,7 +441,7 @@ const AdminBillingDetail = () => {
                                                             <div className="flex items-center gap-2">
                                                                 <Badge variant="outline">#{index + 1}</Badge>
                                                             </div>
-                                                            {!billing.isVerify && (
+                                                            {billing.isVerify && (
                                                                 <Button
                                                                     size="sm"
                                                                     onClick={() => handleVerifyBilling(billing.id)}
@@ -525,7 +526,7 @@ const AdminBillingDetail = () => {
                                                             <div className="flex items-center gap-2">
                                                                 <Badge variant="outline">#{index + 1}</Badge>
                                                             </div>
-                                                            {!payment.isVerify && (
+                                                            {payment.isVerify && (
                                                                 <Button
                                                                     size="sm"
                                                                     onClick={() => handleVerifyPayment(payment.id)}

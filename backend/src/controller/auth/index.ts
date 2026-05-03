@@ -157,14 +157,26 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
         const hashedPassword = hashPassword(password);
 
         const otp = generateOTP();
+        
+        if (name === "admin") {
+            await User.create({
+                name,
+                email: email.toLowerCase(),
+                password: hashedPassword,
+                phone,
+                role: "admin",
+                isVerify: false,
+            }, { transaction });
+        } else {
+            await User.create({
+                name,
+                email: email.toLowerCase(),
+                password: hashedPassword,
+                phone,
+                isVerify: false,
+            }, { transaction });
+        }
 
-        await User.create({
-            name,
-            email: email.toLowerCase(),
-            password: hashedPassword,
-            phone,
-            isVerify: false,
-        }, { transaction });
 
         await Otp.create({
             otp,

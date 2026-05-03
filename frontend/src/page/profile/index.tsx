@@ -372,7 +372,7 @@ const Profile = () => {
                                         <div className="flex gap-4 pt-4">
                                             <Button
                                                 type="submit"
-                                                className="flex-1"
+                                                className="flex-1 border border-2 hover:cursor-pointer hover:shadow-md"
                                                 disabled={isLoading}
                                             >
                                                 <Check className="h-4 w-4 mr-2" />

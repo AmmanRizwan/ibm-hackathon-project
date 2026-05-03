@@ -57,7 +57,7 @@ const NavBar = () => {
               onClick={() => navigate('/')}
               className="text-2xl font-bold transition-colors"
             >
-              Emp Pay
+              EPay
             </button>
           </div>
           

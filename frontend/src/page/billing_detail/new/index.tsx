@@ -210,7 +210,7 @@ const CreateBillingDetail = () => {
                             <div className="flex gap-4 pt-4">
                                 <Button
                                     type="submit"
-                                    className="flex-1 border hover:shadow"
+                                    className="flex-1 border hover:shadow hover:cursor-pointer"
                                     disabled={isLoading}
                                 >
                                     {isLoading ? 'Creating...' : 'Create Billing Detail'}
