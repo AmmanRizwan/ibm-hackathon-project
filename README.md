@@ -134,7 +134,7 @@ IBM Bob was instrumental in accelerating the development of this project. Here's
 - Suggested best practices for React hooks and state management
 
 ### 📊 **Bob Report Location**
-All Bob interaction reports and session logs are stored in the `bob_report.zip` folder at the root of this repository. These reports document
+All Bob interaction reports and session logs are stored in the `bob_session.zip` folder at the root of this repository. These reports document
 ---
 
 ## **Getting Started / Installation**
@@ -316,7 +316,7 @@ After successful setup, you should see:
 ```
 ibm-hackathon-project/
 ├── README.md                          # This file
-├── bob_report.zip                     # IBM Bob interaction reports
+├── bob_session.zip                     # IBM Bob interaction reports
 │   
 │   
 │   
@@ -415,7 +415,7 @@ ibm-hackathon-project/
 
 ### Key Directories Explained
 
-- **`bob_report.zip`**: Contains all IBM Bob session reports
+- **`bob_session.zip`**: Contains all IBM Bob session reports
 - **`backend/src/controller/`**: Handles HTTP requests and responses
 - **`backend/src/models/`**: Database schema definitions using Sequelize
 - **`backend/src/services/`**: Business logic and external service integrations
