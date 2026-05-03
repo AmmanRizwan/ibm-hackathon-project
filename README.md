@@ -296,7 +296,7 @@ sudo docker run -p 1080:1080 -p 1025:1025 maildev/maildev
 - Configure default payment options
 - Update billing details
 
-### Demo Video
+### IBM BOB Demo Video
 
 🎥 **[Watch Demo Video](https://vimeo.com/1188755899?share=copy&fl=sv&fe=ci)**
 
