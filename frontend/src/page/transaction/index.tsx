@@ -10,6 +10,14 @@ import {
     DialogTitle,
     DialogDescription,
 } from '@/components/ui/dialog';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { getUserTransactions } from '@/service/transaction';
 import type { ITransaction } from '@/service/transaction/interface';
 
@@ -164,104 +172,85 @@ const Transaction = () => {
                     {/* Transaction Table - Desktop View */}
                     <Card className="hidden md:block">
                         <CardContent className="p-0">
-                            <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead className="bg-muted/50 border-b">
-                                        <tr>
-                                            <th className="px-6 py-4 text-left text-sm font-semibold">
-                                                Transaction ID
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-semibold">
-                                                Payer
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-semibold">
-                                                Payee
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-semibold">
-                                                Amount
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-semibold">
-                                                Date
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-semibold">
-                                                Status
-                                            </th>
-                                            <th className="px-6 py-4 text-center text-sm font-semibold">
-                                                Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y">
-                                        {transactions.map((transaction) => (
-                                            <tr
-                                                key={transaction._id}
-                                                className="hover:bg-muted/30 transition-colors"
-                                            >
-                                                <td className="px-6 py-4">
-                                                    <span className="font-mono text-sm">
-                                                        {transaction._id}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div>
-                                                        <p className="font-medium">
-                                                            {transaction.payer_name}
-                                                        </p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {transaction.payer_email}
-                                                        </p>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div>
-                                                        <p className="font-medium">
-                                                            {transaction.payee_name}
-                                                        </p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {transaction.payee_email}
-                                                        </p>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 font-semibold">
-                                                    {formatCurrency(transaction.amount)}
-                                                </td>
-                                                <td className="px-6 py-4 text-sm">
-                                                    {formatDate(transaction.transaction_date)}
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <Badge
-                                                        variant={getStatusVariant(transaction.status)}
-                                                    >
-                                                        {transaction.status}
-                                                    </Badge>
-                                                </td>
-                                                <td className="px-6 py-4 text-center">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleViewTransaction(transaction)}
-                                                    >
-                                                        <Eye className="h-4 w-4 mr-2" />
-                                                        View
-                                                    </Button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Transaction ID</TableHead>
+                                        <TableHead>Payer</TableHead>
+                                        <TableHead>Payee</TableHead>
+                                        <TableHead>Amount</TableHead>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-center">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {transactions.map((transaction) => (
+                                        <TableRow key={transaction.id}>
+                                            <TableCell>
+                                                <span className="font-mono text-sm">
+                                                    {transaction.id}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <p className="font-medium">
+                                                        {transaction.payer_name}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {transaction.payer_email}
+                                                    </p>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <p className="font-medium">
+                                                        {transaction.payee_name}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {transaction.payee_email}
+                                                    </p>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="font-semibold">
+                                                {formatCurrency(transaction.amount)}
+                                            </TableCell>
+                                            <TableCell className="text-sm">
+                                                {formatDate(transaction.transaction_date)}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    variant={getStatusVariant(transaction.status)}
+                                                >
+                                                    {transaction.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleViewTransaction(transaction)}
+                                                >
+                                                    <Eye className="h-4 w-4 mr-2" />
+                                                    View
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
                         </CardContent>
                     </Card>
 
                     {/* Transaction Cards - Mobile View */}
                     <div className="md:hidden space-y-4">
                         {transactions.map((transaction) => (
-                            <Card key={transaction._id} className="overflow-hidden">
+                            <Card key={transaction.id} className="overflow-hidden">
                                 <CardContent className="p-4">
                                     <div className="flex justify-between items-start mb-3">
                                         <div className="flex-1">
                                             <p className="font-mono text-xs text-muted-foreground mb-1">
-                                                ID: {transaction._id}
+                                                ID: {transaction.id}
                                             </p>
                                             <p className="text-xl font-bold">
                                                 {formatCurrency(transaction.amount)}
@@ -365,7 +354,7 @@ const Transaction = () => {
                                         Transaction ID
                                     </h3>
                                     <p className="font-mono text-xl font-bold">
-                                        {selectedTransaction._id}
+                                        {selectedTransaction.id}
                                     </p>
                                 </div>
                                 <div className="text-right">

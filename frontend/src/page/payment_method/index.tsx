@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getUserPaymentMethods } from '@/service/payment_methods';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
 
 interface PaymentMethodData {
     id: string;
@@ -20,6 +22,7 @@ interface PaymentMethodData {
 
 const PaymentMethod = () => {
     const navigate = useNavigate();
+    const { user } = useSelector((state: RootState) => state.auth);
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethodData[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -84,19 +87,27 @@ const PaymentMethod = () => {
                                         {method.account_type} Account
                                     </CardDescription>
                                 </div>
-                                <Badge variant={method.isVerify ? "default" : "secondary"}>
-                                    {method.isVerify ? (
-                                        <>
-                                            <CheckCircle className="h-3 w-3 mr-1" />
-                                            Verified
-                                        </>
-                                    ) : (
-                                        <>
-                                            <XCircle className="h-3 w-3 mr-1" />
-                                            Pending
-                                        </>
-                                    )}
-                                </Badge>
+                                {
+                                    user.role === "admin" ?
+                                    (
+                                        null
+                                    ) :
+                                    (
+                                        <Badge variant={method.isVerify ? "default" : "secondary"}>
+                                            {method.isVerify ? (
+                                                <>
+                                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                                    Verified
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <XCircle className="h-3 w-3 mr-1" />
+                                                    Pending
+                                                </>
+                                            )}
+                                        </Badge>
+                                    )
+                                }
                             </div>
                         </CardHeader>
                         <CardContent>

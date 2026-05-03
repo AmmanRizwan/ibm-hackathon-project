@@ -19,6 +19,15 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { Loader2, DollarSign, CheckCircle2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -248,75 +257,70 @@ const AdminPaymentMethod = () => {
                             No verified employees found with complete billing and bank details
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full border-collapse">
-                                <thead>
-                                    <tr className="border-b bg-muted/50">
-                                        <th className="text-left p-4 font-semibold">Name</th>
-                                        <th className="text-left p-4 font-semibold">Bank Account</th>
-                                        <th className="text-left p-4 font-semibold">IFSC Code</th>
-                                        <th className="text-left p-4 font-semibold">Address</th>
-                                        <th className="text-right p-4 font-semibold">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {employees.map((employee) => {
-                                        const paymentMethod = getPaymentMethod(employee.paymentMethods);
-                                        return (
-                                            <tr
-                                                key={employee.id}
-                                                className="border-b hover:bg-muted/30 transition-colors"
-                                            >
-                                                <td className="p-4">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Bank Account</TableHead>
+                                    <TableHead>IFSC Code</TableHead>
+                                    <TableHead>Address</TableHead>
+                                    <TableHead className="text-right">Amount</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {employees.map((employee) => {
+                                    const paymentMethod = getPaymentMethod(employee.paymentMethods);
+                                    return (
+                                        <TableRow key={employee.id}>
+                                            <TableCell>
+                                                <div>
+                                                    <div className="font-medium">{employee.name}</div>
+                                                    <div className="text-sm text-muted-foreground">
+                                                        {employee.email}
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                {paymentMethod ? (
                                                     <div>
-                                                        <div className="font-medium">{employee.name}</div>
+                                                        <div className="font-medium">
+                                                            {paymentMethod.account_number}
+                                                        </div>
                                                         <div className="text-sm text-muted-foreground">
-                                                            {employee.email}
+                                                            {paymentMethod.account_holder_name}
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground">
+                                                            {paymentMethod.bank_name}
                                                         </div>
                                                     </div>
-                                                </td>
-                                                <td className="p-4">
-                                                    {paymentMethod ? (
-                                                        <div>
-                                                            <div className="font-medium">
-                                                                {paymentMethod.account_number}
-                                                            </div>
-                                                            <div className="text-sm text-muted-foreground">
-                                                                {paymentMethod.account_holder_name}
-                                                            </div>
-                                                            <div className="text-xs text-muted-foreground">
-                                                                {paymentMethod.bank_name}
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        'N/A'
-                                                    )}
-                                                </td>
-                                                <td className="p-4">
-                                                    {paymentMethod ? paymentMethod.ifsc : 'N/A'}
-                                                </td>
-                                                <td className="p-4 text-sm">
-                                                    {formatAddress(employee.billingDetails)}
-                                                </td>
-                                                <td className="p-4 text-right font-semibold">
-                                                    ₹{fixedAmount}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                                <tfoot>
-                                    <tr className="border-t-2 bg-muted/30">
-                                        <td colSpan={4} className="p-4 text-right font-semibold">
-                                            Total Amount:
-                                        </td>
-                                        <td className="p-4 text-right font-bold text-lg">
-                                            ₹{(parseFloat(fixedAmount) * employees.length).toLocaleString()}
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
+                                                ) : (
+                                                    'N/A'
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {paymentMethod ? paymentMethod.ifsc : 'N/A'}
+                                            </TableCell>
+                                            <TableCell className="text-sm">
+                                                {formatAddress(employee.billingDetails)}
+                                            </TableCell>
+                                            <TableCell className="text-right font-semibold">
+                                                ₹{fixedAmount}
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                            <TableFooter>
+                                <TableRow>
+                                    <TableCell colSpan={4} className="text-right font-semibold">
+                                        Total Amount:
+                                    </TableCell>
+                                    <TableCell className="text-right font-bold text-lg">
+                                        ₹{(parseFloat(fixedAmount) * employees.length).toLocaleString()}
+                                    </TableCell>
+                                </TableRow>
+                            </TableFooter>
+                        </Table>
                     )}
                 </CardContent>
             </Card>

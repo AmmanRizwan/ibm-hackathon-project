@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { MapPin, Building2, Map, Navigation } from 'lucide-react';
+import { MapPin, Building2, Map, Navigation, CheckCircle, XCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { getUserBillingDetails } from '@/service/billing_details';
 import PageLoader from '@/components/custom/page-loader';
 import { Alert } from '@/components/ui/alert';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
 
 interface BillingDetailType {
     id: string;
@@ -21,6 +24,7 @@ interface BillingDetailType {
 
 const BillingDetail = () => {
     const navigate = useNavigate();
+    const { user } = useSelector((state: RootState) => state.auth);
     const [billingDetails, setBillingDetails] = useState<BillingDetailType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
@@ -81,6 +85,27 @@ const BillingDetail = () => {
                                         Complete billing information
                                     </CardDescription>
                                 </div>
+                                {
+                                    user.role === "admin" ?
+                                    (
+                                      null   
+                                    ) :
+                                    (
+                                        <Badge variant={detail.isVerify ? "default" : "secondary"}>
+                                            {detail.isVerify ? (
+                                                <>
+                                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                                    Verified
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <XCircle className="h-3 w-3 mr-1" />
+                                                    Pending
+                                                </>
+                                            )}
+                                        </Badge>
+                                    )
+                                }
                             </div>
                         </CardHeader>
                         <CardContent>

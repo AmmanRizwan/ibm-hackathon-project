@@ -55,7 +55,7 @@ const NavBar = () => {
           <div className="flex-shrink-0">
             <button
               onClick={() => navigate('/')}
-              className="text-2xl font-bold md:hidden transition-colors"
+              className="text-2xl font-bold transition-colors"
             >
               Emp Pay
             </button>
@@ -64,10 +64,10 @@ const NavBar = () => {
           {/* Right side - Login/Profile */}
           <div className="flex items-center">
               {
-                toggle ?
+                toggle || location.pathname === '/' ?
                 (
                   null
-                ) : 
+                ) :
                 (
                   <Button className='lg:hidden block w-10 h-10' onClick={handleSlideBar}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

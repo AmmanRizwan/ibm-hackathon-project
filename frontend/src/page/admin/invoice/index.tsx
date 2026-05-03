@@ -28,6 +28,14 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import {
     FileText,
     Eye,
     Edit,
@@ -350,107 +358,102 @@ const AdminInvoice = () => {
                             <p>No invoices found</p>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full border-collapse">
-                                <thead>
-                                    <tr className="border-b bg-muted/50">
-                                        <th className="text-left p-4 font-semibold">Invoice #</th>
-                                        <th className="text-left p-4 font-semibold">Customer</th>
-                                        <th className="text-left p-4 font-semibold">User</th>
-                                        <th className="text-left p-4 font-semibold">Date</th>
-                                        <th className="text-left p-4 font-semibold">Amount</th>
-                                        <th className="text-left p-4 font-semibold">Payment</th>
-                                        <th className="text-left p-4 font-semibold">Status</th>
-                                        <th className="text-center p-4 font-semibold">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {invoices.map((invoice) => (
-                                        <tr
-                                            key={invoice.id}
-                                            className="border-b hover:bg-muted/30 transition-colors"
-                                        >
-                                            <td className="p-4 font-medium">
-                                                {invoice.invoice_number}
-                                            </td>
-                                            <td className="p-4">
-                                                <div>
-                                                    <p className="font-medium">
-                                                        {invoice.customer_name}
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Invoice #</TableHead>
+                                    <TableHead>Customer</TableHead>
+                                    <TableHead>User</TableHead>
+                                    <TableHead>Date</TableHead>
+                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Payment</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="text-center">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {invoices.map((invoice) => (
+                                    <TableRow key={invoice.id}>
+                                        <TableCell className="font-medium">
+                                            {invoice.invoice_number}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div>
+                                                <p className="font-medium">
+                                                    {invoice.customer_name}
+                                                </p>
+                                                {invoice.customer_email && (
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {invoice.customer_email}
                                                     </p>
-                                                    {invoice.customer_email && (
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {invoice.customer_email}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="p-4">
-                                                {invoice.user && (
-                                                    <div>
-                                                        <p className="font-medium text-sm">
-                                                            {invoice.user.name}
-                                                        </p>
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {invoice.user.email}
-                                                        </p>
-                                                    </div>
                                                 )}
-                                            </td>
-                                            <td className="p-4 text-sm">
-                                                {formatDate(invoice.invoice_date)}
-                                            </td>
-                                            <td className="p-4 font-semibold">
-                                                {formatCurrency(invoice.total_amount)}
-                                            </td>
-                                            <td className="p-4">
-                                                <Badge
-                                                    variant={getPaymentStatusVariant(
-                                                        invoice.payment_status
-                                                    )}
-                                                    className="capitalize"
-                                                >
-                                                    {invoice.payment_status}
-                                                </Badge>
-                                            </td>
-                                            <td className="p-4">
-                                                <Badge
-                                                    variant={getStatusVariant(invoice.status)}
-                                                    className="capitalize"
-                                                >
-                                                    {invoice.status}
-                                                </Badge>
-                                            </td>
-                                            <td className="p-4">
-                                                <div className="flex justify-center gap-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleViewInvoice(invoice)}
-                                                    >
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleEditInvoice(invoice)}
-                                                    >
-                                                        <Edit className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleDeleteInvoice(invoice)}
-                                                    >
-                                                        <Trash2 className="h-4 w-4 text-destructive" />
-                                                    </Button>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            {invoice.user && (
+                                                <div>
+                                                    <p className="font-medium text-sm">
+                                                        {invoice.user.name}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {invoice.user.email}
+                                                    </p>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="text-sm">
+                                            {formatDate(invoice.invoice_date)}
+                                        </TableCell>
+                                        <TableCell className="font-semibold">
+                                            {formatCurrency(invoice.total_amount)}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                variant={getPaymentStatusVariant(
+                                                    invoice.payment_status
+                                                )}
+                                                className="capitalize"
+                                            >
+                                                {invoice.payment_status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                variant={getStatusVariant(invoice.status)}
+                                                className="capitalize"
+                                            >
+                                                {invoice.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex justify-center gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleViewInvoice(invoice)}
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleEditInvoice(invoice)}
+                                                >
+                                                    <Edit className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleDeleteInvoice(invoice)}
+                                                >
+                                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     )}
                 </CardContent>
             </Card>

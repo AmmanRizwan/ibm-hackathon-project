@@ -20,7 +20,7 @@ const Sidebar = () => {
   const { toggle } = useSelector((state: RootState) => state.navToggle);
   const { user, token } = useSelector((state: RootState) => state.auth);
 
-  const isAdmin = true;
+  const isAdmin = user.role === "admin";
   
   // Routes where sidebar should not be displayed
   const excludedRoutes = ['/auth/login', '/auth/signup', '/auth/forgot-password'];
@@ -79,6 +79,7 @@ const Sidebar = () => {
           <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
         </svg>
       ),
+      adminOnly: false, // Users only
     },
     {
       title: 'Transactions',
@@ -88,6 +89,7 @@ const Sidebar = () => {
           <path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 10-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z" />
         </svg>
       ),
+      adminOnly: false, // Users only
     },
   ];
 
@@ -134,7 +136,12 @@ const Sidebar = () => {
     },
   ];
 
-  const allMenuItems = isAdmin ? [...menuItems, ...adminMenuItems] : menuItems;
+  // Filter menu items based on user role
+  const filteredMenuItems = isAdmin
+    ? menuItems.filter(item => item.adminOnly !== false) // Exclude items marked as user-only (adminOnly: false)
+    : menuItems.filter(item => item.adminOnly !== true);  // Exclude items marked as admin-only
+  
+  const allMenuItems = isAdmin ? [...filteredMenuItems, ...adminMenuItems] : filteredMenuItems;
 
   const handleNavigation = (path: string) => {
     navigate(path);

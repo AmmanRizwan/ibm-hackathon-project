@@ -39,15 +39,16 @@ export const getAllTransactions = async (
         const totalPages = Math.ceil(totalCount / limit);
 
         res.status(200).json({
+            success: true,
             message: "Transactions retrieved successfully!",
-            data: transactions,
-            pagination: {
-                currentPage: page,
-                totalPages,
-                totalCount,
-                limit,
-                hasNextPage: page < totalPages,
-                hasPreviousPage: page > 1
+            data: {
+                transactions,
+                pagination: {
+                    total: totalCount,
+                    page: page,
+                    limit: limit,
+                    totalPages: totalPages
+                }
             }
         });
     }
@@ -375,15 +376,16 @@ export const getUserTransactions = async (
         const totalPages = Math.ceil(totalCount / limit);
 
         res.status(200).json({
+            success: true,
             message: "User transactions retrieved successfully!",
-            data: transactions,
-            pagination: {
-                currentPage: page,
-                totalPages,
-                totalCount,
-                limit,
-                hasNextPage: page < totalPages,
-                hasPreviousPage: page > 1
+            data: {
+                transactions,
+                pagination: {
+                    total: totalCount,
+                    page: page,
+                    limit: limit,
+                    totalPages: totalPages
+                }
             }
         });
     }

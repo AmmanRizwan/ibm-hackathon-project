@@ -20,6 +20,14 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { Trash2, Edit, Loader2, CheckCircle2, XCircle, Eye, CreditCard, MapPin } from 'lucide-react';
 
 const AdminBillingDetail = () => {
@@ -219,110 +227,105 @@ const AdminBillingDetail = () => {
                             No employees found
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full border-collapse">
-                                <thead>
-                                    <tr className="border-b bg-muted/50">
-                                        <th className="text-left p-4 font-semibold">Name</th>
-                                        <th className="text-left p-4 font-semibold">Email</th>
-                                        <th className="text-left p-4 font-semibold">Phone</th>
-                                        <th className="text-left p-4 font-semibold">Status</th>
-                                        <th className="text-left p-4 font-semibold">Details</th>
-                                        <th className="text-left p-4 font-semibold">Joined</th>
-                                        <th className="text-center p-4 font-semibold">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {employees.map((employee) => (
-                                        <tr
-                                            key={employee.id}
-                                            className="border-b hover:bg-muted/30 transition-colors"
-                                        >
-                                            <td className="p-4">
-                                                <div className="font-medium">{employee.name}</div>
-                                            </td>
-                                            <td className="p-4">
-                                                <div className="text-sm">{employee.email}</div>
-                                            </td>
-                                            <td className="p-4">
-                                                <div className="text-sm">{employee.phone}</div>
-                                            </td>
-                                            <td className="p-4">
-                                                <Badge
-                                                    variant={employee.isVerify ? 'default' : 'secondary'}
-                                                    className={
-                                                        employee.isVerify
-                                                            ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                                                            : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                                                    }
-                                                >
-                                                    {employee.isVerify ? (
-                                                        <>
-                                                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                                                            Verified
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <XCircle className="h-3 w-3 mr-1" />
-                                                            Pending
-                                                        </>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Phone</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Details</TableHead>
+                                    <TableHead>Joined</TableHead>
+                                    <TableHead className="text-center">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {employees.map((employee) => (
+                                    <TableRow key={employee.id}>
+                                        <TableCell>
+                                            <div className="font-medium">{employee.name}</div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="text-sm">{employee.email}</div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="text-sm">{employee.phone}</div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                variant={employee.isVerify ? 'default' : 'secondary'}
+                                                className={
+                                                    employee.isVerify
+                                                        ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                                                        : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                                                }
+                                            >
+                                                {employee.isVerify ? (
+                                                    <>
+                                                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                                                        Verified
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <XCircle className="h-3 w-3 mr-1" />
+                                                        Pending
+                                                    </>
+                                                )}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-2 text-xs">
+                                                    <MapPin className="h-3 w-3 text-muted-foreground" />
+                                                    <span className="text-muted-foreground">
+                                                        {employee.billingDetails?.length || 0} Billing
+                                                    </span>
+                                                    {employee.billingDetails?.some(b => !b.isVerify) && (
+                                                        <Badge variant="outline" className="text-xs px-1 py-0">
+                                                            {employee.billingDetails.filter(b => !b.isVerify).length} pending
+                                                        </Badge>
                                                     )}
-                                                </Badge>
-                                            </td>
-                                            <td className="p-4">
-                                                <div className="flex flex-col gap-1">
-                                                    <div className="flex items-center gap-2 text-xs">
-                                                        <MapPin className="h-3 w-3 text-muted-foreground" />
-                                                        <span className="text-muted-foreground">
-                                                            {employee.billingDetails?.length || 0} Billing
-                                                        </span>
-                                                        {employee.billingDetails?.some(b => !b.isVerify) && (
-                                                            <Badge variant="outline" className="text-xs px-1 py-0">
-                                                                {employee.billingDetails.filter(b => !b.isVerify).length} pending
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-xs">
-                                                        <CreditCard className="h-3 w-3 text-muted-foreground" />
-                                                        <span className="text-muted-foreground">
-                                                            {employee.paymentMethods?.length || 0} Payment
-                                                        </span>
-                                                        {employee.paymentMethods?.some(p => !p.isVerify) && (
-                                                            <Badge variant="outline" className="text-xs px-1 py-0">
-                                                                {employee.paymentMethods.filter(p => !p.isVerify).length} pending
-                                                            </Badge>
-                                                        )}
-                                                    </div>
                                                 </div>
-                                            </td>
-                                            <td className="p-4 text-sm text-muted-foreground">
-                                                {formatDate(employee.createdAt)}
-                                            </td>
-                                            <td className="p-4">
-                                                <div className="flex justify-center gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => openEditDialog(employee)}
-                                                    >
-                                                        <Eye className="h-4 w-4 mr-1" />
-                                                        View Details
-                                                    </Button>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="sm"
-                                                        onClick={() => openDeleteDialog(employee)}
-                                                    >
-                                                        <Trash2 className="h-4 w-4 mr-1" />
-                                                        Delete
-                                                    </Button>
+                                                <div className="flex items-center gap-2 text-xs">
+                                                    <CreditCard className="h-3 w-3 text-muted-foreground" />
+                                                    <span className="text-muted-foreground">
+                                                        {employee.paymentMethods?.length || 0} Payment
+                                                    </span>
+                                                    {employee.paymentMethods?.some(p => !p.isVerify) && (
+                                                        <Badge variant="outline" className="text-xs px-1 py-0">
+                                                            {employee.paymentMethods.filter(p => !p.isVerify).length} pending
+                                                        </Badge>
+                                                    )}
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-sm text-muted-foreground">
+                                            {formatDate(employee.createdAt)}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex justify-center gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => openEditDialog(employee)}
+                                                >
+                                                    <Eye className="h-4 w-4 mr-1" />
+                                                    View Details
+                                                </Button>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() => openDeleteDialog(employee)}
+                                                >
+                                                    <Trash2 className="h-4 w-4 mr-1" />
+                                                    Delete
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     )}
                 </CardContent>
             </Card>
@@ -436,26 +439,6 @@ const AdminBillingDetail = () => {
                                                         <div className="flex items-start justify-between mb-3">
                                                             <div className="flex items-center gap-2">
                                                                 <Badge variant="outline">#{index + 1}</Badge>
-                                                                <Badge
-                                                                    variant={billing.isVerify ? 'default' : 'secondary'}
-                                                                    className={
-                                                                        billing.isVerify
-                                                                            ? 'bg-green-100 text-green-800'
-                                                                            : 'bg-yellow-100 text-yellow-800'
-                                                                    }
-                                                                >
-                                                                    {billing.isVerify ? (
-                                                                        <>
-                                                                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                                                                            Verified
-                                                                        </>
-                                                                    ) : (
-                                                                        <>
-                                                                            <XCircle className="h-3 w-3 mr-1" />
-                                                                            Pending
-                                                                        </>
-                                                                    )}
-                                                                </Badge>
                                                             </div>
                                                             {!billing.isVerify && (
                                                                 <Button
@@ -541,26 +524,6 @@ const AdminBillingDetail = () => {
                                                         <div className="flex items-start justify-between mb-3">
                                                             <div className="flex items-center gap-2">
                                                                 <Badge variant="outline">#{index + 1}</Badge>
-                                                                <Badge
-                                                                    variant={payment.isVerify ? 'default' : 'secondary'}
-                                                                    className={
-                                                                        payment.isVerify
-                                                                            ? 'bg-green-100 text-green-800'
-                                                                            : 'bg-yellow-100 text-yellow-800'
-                                                                    }
-                                                                >
-                                                                    {payment.isVerify ? (
-                                                                        <>
-                                                                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                                                                            Verified
-                                                                        </>
-                                                                    ) : (
-                                                                        <>
-                                                                            <XCircle className="h-3 w-3 mr-1" />
-                                                                            Pending
-                                                                        </>
-                                                                    )}
-                                                                </Badge>
                                                             </div>
                                                             {!payment.isVerify && (
                                                                 <Button

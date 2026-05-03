@@ -1,5 +1,4 @@
 export interface ICreateTransaction {
-    payer_bank_account_id?: string;
     payee_bank_account_id: string;
     payer_name: string;
     payer_email: string;
@@ -37,7 +36,7 @@ export interface IGetUserTransactionsQuery {
 }
 
 export interface ITransaction {
-    _id: string;
+    id: string;
     payer_bank_account_id: string;
     payee_bank_account_id: string;
     payer_name: string;

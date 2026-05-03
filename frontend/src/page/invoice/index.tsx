@@ -10,6 +10,14 @@ import {
     DialogTitle,
     DialogDescription,
 } from '@/components/ui/dialog';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { getUserInvoices, getInvoiceById } from '@/service/invoice';
 
 interface Invoice {
@@ -142,93 +150,74 @@ const Invoice = () => {
                     {/* Invoice Table */}
                     <Card>
                         <CardContent className="p-0">
-                            <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead className="bg-muted/50 border-b">
-                                        <tr>
-                                            <th className="px-6 py-4 text-left text-sm font-semibold">
-                                                Invoice #
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-semibold">
-                                                Customer
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-semibold">
-                                                Date
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-semibold">
-                                                Amount
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-semibold">
-                                                Payment Status
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-semibold">
-                                                Status
-                                            </th>
-                                            <th className="px-6 py-4 text-center text-sm font-semibold">
-                                                Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y">
-                                        {invoices.map((invoice) => (
-                                            <tr
-                                                key={invoice.id}
-                                                className="hover:bg-muted/30 transition-colors"
-                                            >
-                                                <td className="px-6 py-4">
-                                                    <span className="font-medium">
-                                                        {invoice.invoice_number}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div>
-                                                        <p className="font-medium">
-                                                            {invoice.customer_name}
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Invoice #</TableHead>
+                                        <TableHead>Customer</TableHead>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead>Amount</TableHead>
+                                        <TableHead>Payment Status</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-center">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {invoices.map((invoice) => (
+                                        <TableRow key={invoice.id}>
+                                            <TableCell>
+                                                <span className="font-medium">
+                                                    {invoice.invoice_number}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <p className="font-medium">
+                                                        {invoice.customer_name}
+                                                    </p>
+                                                    {invoice.customer_email && (
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {invoice.customer_email}
                                                         </p>
-                                                        {invoice.customer_email && (
-                                                            <p className="text-sm text-muted-foreground">
-                                                                {invoice.customer_email}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 text-sm">
-                                                    {formatDate(invoice.invoice_date)}
-                                                </td>
-                                                <td className="px-6 py-4 font-semibold">
-                                                    {formatCurrency(invoice.total_amount)}
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <Badge
-                                                        variant={getPaymentStatusVariant(
-                                                            invoice.payment_status
-                                                        )}
-                                                    >
-                                                        {invoice.payment_status}
-                                                    </Badge>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <Badge
-                                                        variant={getStatusVariant(invoice.status)}
-                                                    >
-                                                        {invoice.status}
-                                                    </Badge>
-                                                </td>
-                                                <td className="px-6 py-4 text-center">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleViewInvoice(invoice.id)}
-                                                    >
-                                                        <Eye className="h-4 w-4 mr-2" />
-                                                        View
-                                                    </Button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-sm">
+                                                {formatDate(invoice.invoice_date)}
+                                            </TableCell>
+                                            <TableCell className="font-semibold">
+                                                {formatCurrency(invoice.total_amount)}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    variant={getPaymentStatusVariant(
+                                                        invoice.payment_status
+                                                    )}
+                                                >
+                                                    {invoice.payment_status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    variant={getStatusVariant(invoice.status)}
+                                                >
+                                                    {invoice.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleViewInvoice(invoice.id)}
+                                                >
+                                                    <Eye className="h-4 w-4 mr-2" />
+                                                    View
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
                         </CardContent>
                     </Card>
 
